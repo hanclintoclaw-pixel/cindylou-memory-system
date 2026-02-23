@@ -21,3 +21,8 @@ python3 scripts/build_sr3_lore_kb.py
 ```
 
 Adjust paths/configs in scripts for your environment.
+
+## Canonical local layout
+- Code: `/Users/hanclaw/claw/projects/cindylou/`
+- Raw inputs: `/Volumes/carbonite/GDrive/cindylou/`
+- Intermediates/cache: `/Volumes/carbonite/claw/data/cindylou/`
