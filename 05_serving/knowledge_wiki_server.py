@@ -13,7 +13,7 @@ import time
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, quote, unquote, urlparse
 
 try:
     import markdown
@@ -36,6 +36,7 @@ MANIFEST_PATH = CONSOLIDATED_ROOT / 'entity_manifest.jsonl'
 CAMPAIGN_TIMELINE_PATH = MEMORY_ROOT / '90_derived' / 'CAMPAIGN_INTRO_TIMELINE.md'
 QUEUE_FILE = MEMORY_ROOT / 'entity_request_queue.jsonl'
 PLAYER_INPUT_FILE = MEMORY_ROOT / 'player_input' / 'submissions.jsonl'
+DEBUG_SOURCE_ROOTS = [MEMORY_ROOT, P.raw_root, P.cleaned_root, P.data_root]
 WIKI_PASSWORD = os.environ.get('WIKI_PASSWORD', 'neilbreen')
 SESSION_COOKIE = 'cindywiki_session'
 SESSION_TTL_SEC = 60 * 60 * 24 * 7
@@ -87,6 +88,36 @@ def append_queue(entity: str, note: str = ''):
     }
     with QUEUE_FILE.open('a', encoding='utf-8') as f:
         f.write(json.dumps(obj, ensure_ascii=False) + '\n')
+
+
+def read_player_input():
+    if not PLAYER_INPUT_FILE.exists():
+        return []
+    rows = []
+    for line in PLAYER_INPUT_FILE.read_text(encoding='utf-8', errors='replace').splitlines():
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except Exception:
+            continue
+    return rows
+
+
+def safe_source_path(path_value: str | None) -> Path | None:
+    if not path_value:
+        return None
+    raw = unquote(path_value).strip()
+    if not raw:
+        return None
+    p = Path(raw).expanduser().resolve()
+    for root in DEBUG_SOURCE_ROOTS:
+        try:
+            p.relative_to(root.resolve())
+            return p
+        except Exception:
+            continue
+    return None
 
 
 def append_player_input(entity: str, player: str, note: str, request_type: str = 'fact'):
@@ -327,7 +358,7 @@ button {{ padding:.5rem .75rem; }}
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head><body>
 <div class=\"header\"><div><strong>Cindy Lou Jenkins — Knowledge Wiki</strong></div>
-<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/campaign-timeline\">Campaign Timeline</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
+<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/campaign-timeline\">Campaign Timeline</a><a href=\"/article/data-diagnostics\">Data Diagnostics</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
 {body_html}
 <script>
 (() => {{
@@ -466,6 +497,12 @@ class WikiHandler(BaseHTTPRequestHandler):
         if path == '/article/campaign-timeline':
             self.serve_campaign_timeline()
             return
+        if path == '/article/data-diagnostics':
+            self.serve_data_diagnostics(articles)
+            return
+        if path == '/debug/source':
+            self.serve_source_debug(parsed)
+            return
         if path == '/article/entity-queue':
             self.serve_queue(articles, inbound_count, pattern, name_to_slug)
             return
@@ -544,6 +581,93 @@ class WikiHandler(BaseHTTPRequestHandler):
             )
         self.respond_html(render_page('Campaign Timeline', body))
 
+    def serve_data_diagnostics(self, articles):
+        manifest_count = 0
+        campaign_manifest = 0
+        general_manifest = 0
+        if MANIFEST_PATH.exists():
+            for line in MANIFEST_PATH.read_text(encoding='utf-8', errors='replace').splitlines():
+                if not line.strip():
+                    continue
+                try:
+                    row = json.loads(line)
+                except Exception:
+                    continue
+                manifest_count += 1
+                if str(row.get('scope', '')).lower() == 'campaign':
+                    campaign_manifest += 1
+                elif str(row.get('scope', '')).lower() == 'general':
+                    general_manifest += 1
+
+        queue_rows = read_queue()
+        player_rows = read_player_input()
+
+        by_cat = {}
+        for a in articles.values():
+            by_cat[a.category] = by_cat.get(a.category, 0) + 1
+
+        cards = [
+            '<h1>Data Diagnostics</h1>',
+            '<p>Coverage snapshot of loaded wiki data, manifest state, and incoming suggestion queues.</p>',
+            '<div class="card"><h3>Loaded Articles</h3><ul>'
+        ]
+        for k in sorted(by_cat):
+            cards.append(f'<li><strong>{html.escape(k)}</strong>: {by_cat[k]}</li>')
+        cards.append(f'<li><strong>Total</strong>: {len(articles)}</li>')
+        cards.append('</ul></div>')
+
+        cards.append('<div class="card"><h3>Manifest Coverage</h3><ul>')
+        cards.append(f'<li>Manifest path: <code>{html.escape(str(MANIFEST_PATH))}</code></li>')
+        cards.append(f'<li>Rows: {manifest_count}</li>')
+        cards.append(f'<li>Campaign entities: {campaign_manifest}</li>')
+        cards.append(f'<li>General entities: {general_manifest}</li>')
+        cards.append('</ul></div>')
+
+        cards.append('<div class="card"><h3>Incoming Suggestions</h3><ul>')
+        cards.append(f'<li>Entity request queue items: {len(queue_rows)}</li>')
+        cards.append(f'<li>Player submissions: {len(player_rows)}</li>')
+        if queue_rows:
+            latest_q = sorted(queue_rows, key=lambda x: x.get('ts', 0), reverse=True)[:5]
+            cards.append('<li>Latest queue entries:<ul>')
+            for r in latest_q:
+                ts = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(r.get('ts', 0)))
+                cards.append(f"<li>{html.escape(r.get('entity',''))} — <span class='meta'>{ts}</span></li>")
+            cards.append('</ul></li>')
+        cards.append('</ul></div>')
+
+        self.respond_html(render_page('Data Diagnostics', ''.join(cards)))
+
+    def serve_source_debug(self, parsed):
+        q = parse_qs(parsed.query)
+        src = (q.get('path', [''])[0] or '')
+        p = safe_source_path(src)
+        if not p:
+            body = (
+                '<h1>Source Debug View</h1>'
+                '<div class="card"><p>Provide a source path with <code>?path=...</code>.</p>'
+                '<p class="meta">Allowed roots include cleaned memory, raw source root, and data root.</p></div>'
+            )
+            self.respond_html(render_page('Source Debug', body))
+            return
+        if not p.exists() or not p.is_file():
+            self.respond_html(render_page('Source Debug', f"<h1>Source Debug View</h1><div class='card'><p>Not found: <code>{html.escape(str(p))}</code></p></div>"))
+            return
+
+        if p.suffix.lower() == '.jsonl':
+            lines = p.read_text(encoding='utf-8', errors='replace').splitlines()[:500]
+            content = '\n'.join(lines)
+        else:
+            content = p.read_text(encoding='utf-8', errors='replace')
+            lines = content.splitlines()[:1200]
+            content = '\n'.join(lines)
+
+        body = (
+            '<h1>Source Debug View</h1>'
+            f"<div class='meta'>Source: <code>{html.escape(str(p))}</code></div>"
+            f"<div class='card'><pre><code>{html.escape(content)}</code></pre></div>"
+        )
+        self.respond_html(render_page('Source Debug', body))
+
     def serve_article(self, articles, inbound_count, inbound_sources, pattern, name_to_slug, slug):
         a = articles.get(slug)
         if not a:
@@ -570,7 +694,8 @@ class WikiHandler(BaseHTTPRequestHandler):
             f'| Outbound links: <strong>{len(refs)}</strong>'
         )
         if a.path:
-            meta += f' | Source: <code>{html.escape(str(a.path))}</code>'
+            src_q = quote(str(a.path))
+            meta += f' | Source: <a href="/debug/source?path={src_q}"><code>{html.escape(str(a.path))}</code></a>'
         meta += '</div>'
 
         backlink_block = ['<div class="card"><h3>Referenced by</h3>']
