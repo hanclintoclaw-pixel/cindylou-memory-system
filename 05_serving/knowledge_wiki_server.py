@@ -30,8 +30,11 @@ from config.pipeline_paths import get_paths
 
 P = get_paths()
 WS = P.repo_root
-QUEUE_FILE = P.memory_root / 'entity_request_queue.jsonl'
-PLAYER_INPUT_FILE = P.memory_root / 'player_input' / 'submissions.jsonl'
+MEMORY_ROOT = Path(os.environ.get('MEMORY_ROOT', str(P.cleaned_root / 'memory')))
+CONSOLIDATED_ROOT = MEMORY_ROOT / '10_consolidated'
+MANIFEST_PATH = CONSOLIDATED_ROOT / 'entity_manifest.jsonl'
+QUEUE_FILE = MEMORY_ROOT / 'entity_request_queue.jsonl'
+PLAYER_INPUT_FILE = MEMORY_ROOT / 'player_input' / 'submissions.jsonl'
 WIKI_PASSWORD = os.environ.get('WIKI_PASSWORD', 'neilbreen')
 SESSION_COOKIE = 'cindywiki_session'
 SESSION_TTL_SEC = 60 * 60 * 24 * 7
@@ -108,6 +111,28 @@ def list_entity_choices(articles: dict[str, Article]):
     return sorted(set(n for n in names if n))
 
 
+def load_manifest_rows():
+    rows = []
+    if not MANIFEST_PATH.exists():
+        return rows
+    for line in MANIFEST_PATH.read_text(encoding='utf-8', errors='replace').splitlines():
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except Exception:
+            continue
+    return rows
+
+
+def aggregate_entity_markdown(md_paths: list[Path]) -> str:
+    parts = []
+    for mp in sorted(md_paths, key=lambda x: x.name.lower()):
+        if mp.exists():
+            parts.append(load_markdown(mp).strip())
+    return '\n\n'.join(p for p in parts if p).strip()
+
+
 def build_articles() -> dict[str, Article]:
     articles: dict[str, Article] = {}
 
@@ -118,41 +143,67 @@ def build_articles() -> dict[str, Article]:
     cindy_body = '\n\n'.join(cindy_parts).strip() or '# Cindy Lou Jenkins\n\nNo profile found yet.'
     articles['cindy-lou-jenkins'] = Article('cindy-lou-jenkins', 'Cindy Lou Jenkins', None, cindy_body, 'core')
 
-    roots = [
-        (WS / 'memory' / 'lore', 'lore', 'general'),
-        (WS / 'memory' / 'topics', 'topics', 'general'),
-    ]
+    manifest_rows = load_manifest_rows()
+    if manifest_rows:
+        for row in manifest_rows:
+            entity = row.get('entity', '').strip()
+            scope = row.get('scope', '').strip().lower()
+            md_files = [Path(x) for x in row.get('md_files', []) if str(x).strip()]
+            jsonl_files = [Path(x) for x in row.get('jsonl_files', []) if str(x).strip()]
+            if not entity or not md_files:
+                continue
+            slug_base = entity.replace('_', '-').lower()
+            if scope == 'campaign':
+                slug = f'campaign-entities-{slug_base}'
+                category = 'campaign'
+            else:
+                slug = f'lore-entities-{slug_base}'
+                category = 'general'
 
-    for root, slug_prefix, category in roots:
+            body = aggregate_entity_markdown(md_files)
+            if jsonl_files:
+                body += '\n\n## Data files (JSONL)\n'
+                for jf in sorted(jsonl_files, key=lambda x: x.name.lower()):
+                    body += f"\n- `{jf.name}`"
+            title = heading_title(body, entity.replace('-', ' ').title())
+            articles[slug] = Article(slug, title, md_files[0], body, category)
+    else:
+        for root, slug_prefix, category in [
+            (CONSOLIDATED_ROOT / 'general' / 'entities', 'lore-entities', 'general'),
+            (CONSOLIDATED_ROOT / 'campaign' / 'entities', 'campaign-entities', 'campaign'),
+        ]:
+            if not root.exists():
+                continue
+            groups = {}
+            for md in root.glob('*.md'):
+                base = md.stem.split('.', 1)[0]
+                groups.setdefault(base, []).append(md)
+            for base, md_paths in groups.items():
+                slug = f"{slug_prefix}-{base.replace('_', '-').lower()}"
+                body = aggregate_entity_markdown(md_paths)
+                title = heading_title(body, base.replace('-', ' ').title())
+                articles[slug] = Article(slug, title, md_paths[0], body, category)
+
+    for root, slug_prefix, category in [
+        (MEMORY_ROOT / 'topics', 'topics', 'general'),
+        (CONSOLIDATED_ROOT / 'sessions', 'sessions', 'campaign'),
+    ]:
         if not root.exists():
             continue
         for md in sorted(root.rglob('*.md')):
             rel = md.relative_to(root)
             slug = f"{slug_prefix}-" + '-'.join(rel.with_suffix('').parts).lower().replace('_', '-')
-            text = load_markdown(md)
-            title = heading_title(text, rel.stem.replace('_', ' ').title())
-            articles[slug] = Article(slug, title, md, text, category)
+            text_md = load_markdown(md)
+            title = heading_title(text_md, rel.stem.replace('_', ' ').title())
+            articles[slug] = Article(slug, title, md, text_md, category)
 
-    # Campaign articles: only active campaign corpus, not legacy general spillover
-    campaign_root = WS / 'memory' / 'campaign'
-    campaign_paths = [
-        (campaign_root / 'CAMPAIGN_INDEX.md', 'campaign-campaign-index', 'campaign'),
-    ]
-    if (campaign_root / 'entities').exists():
-        for md in sorted((campaign_root / 'entities').glob('*.md')):
-            slug = 'campaign-entities-' + md.stem.replace('_', '-').lower()
-            campaign_paths.append((md, slug, 'campaign'))
-    if (campaign_root / 'requests').exists():
-        for md in sorted((campaign_root / 'requests').glob('*.md')):
+    requests_root = MEMORY_ROOT / 'campaign' / 'requests'
+    if requests_root.exists():
+        for md in sorted(requests_root.glob('*.md')):
             slug = 'campaign-requests-' + md.stem.replace('_', '-').lower()
-            campaign_paths.append((md, slug, 'campaign-queue'))
-
-    for md, slug, cat in campaign_paths:
-        if not md.exists():
-            continue
-        text = load_markdown(md)
-        title = heading_title(text, md.stem.replace('_', ' ').title())
-        articles[slug] = Article(slug, title, md, text, cat)
+            text_md = load_markdown(md)
+            title = heading_title(text_md, md.stem.replace('_', ' ').title())
+            articles[slug] = Article(slug, title, md, text_md, 'campaign-queue')
 
     articles['index'] = Article('index', 'Index', None, '# Index\n\nBrowse every knowledge article.', 'core')
     articles['entity-queue'] = Article('entity-queue', 'Entity Request Queue', None, '# Entity Request Queue', 'core')
