@@ -39,6 +39,7 @@ python3 03_organization/build_campaign_kb.py
 python3 03_organization/build_sr3_lore_kb.py
 python3 03_organization/build_sr3_topic_memory.py
 python3 03_organization/build_entity_manifest.py
+python3 03_organization/build_campaign_intro_timeline.py
 ```
 
 Serving:

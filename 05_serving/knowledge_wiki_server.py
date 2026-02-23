@@ -33,6 +33,7 @@ WS = P.repo_root
 MEMORY_ROOT = Path(os.environ.get('MEMORY_ROOT', str(P.cleaned_root / 'memory')))
 CONSOLIDATED_ROOT = MEMORY_ROOT / '10_consolidated'
 MANIFEST_PATH = CONSOLIDATED_ROOT / 'entity_manifest.jsonl'
+CAMPAIGN_TIMELINE_PATH = MEMORY_ROOT / '90_derived' / 'CAMPAIGN_INTRO_TIMELINE.md'
 QUEUE_FILE = MEMORY_ROOT / 'entity_request_queue.jsonl'
 PLAYER_INPUT_FILE = MEMORY_ROOT / 'player_input' / 'submissions.jsonl'
 WIKI_PASSWORD = os.environ.get('WIKI_PASSWORD', 'neilbreen')
@@ -297,12 +298,32 @@ a {{ color:#0b57d0; text-decoration:none; }} a:hover {{ text-decoration:underlin
 .meta {{ color:#555; font-size:.93rem; margin-bottom:.7rem; }}
 code {{ background:#f5f5f5; padding:0 .2rem; border-radius:4px; }}
 pre {{ background:#111; color:#eaeaea; padding:.8rem; border-radius:8px; overflow:auto; }}
+.mermaid {{ background:#fff; border:1px solid #ddd; border-radius:8px; padding:.75rem; overflow:auto; }}
 input, textarea {{ width:100%; padding:.5rem; margin:.25rem 0 .6rem 0; }}
 button {{ padding:.5rem .75rem; }}
-</style></head><body>
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head><body>
 <div class=\"header\"><div><strong>Cindy Lou Jenkins — Knowledge Wiki</strong></div>
-<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
+<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/campaign-timeline\">Campaign Timeline</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
 {body_html}
+<script>
+(() => {{
+  const blocks = document.querySelectorAll('pre > code.language-mermaid, pre > code.lang-mermaid');
+  if (!blocks.length) return;
+  blocks.forEach((codeEl) => {{
+    const pre = codeEl.parentElement;
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = codeEl.textContent || '';
+    pre.replaceWith(div);
+  }});
+  if (window.mermaid) {{
+    mermaid.initialize({{ startOnLoad: false, securityLevel: 'loose', theme: 'default' }});
+    mermaid.run({{ querySelector: '.mermaid' }});
+  }}
+}})();
+</script>
 </body></html>"""
 
 
@@ -420,6 +441,9 @@ class WikiHandler(BaseHTTPRequestHandler):
         if path == '/article/index':
             self.serve_index(articles, inbound_count)
             return
+        if path == '/article/campaign-timeline':
+            self.serve_campaign_timeline()
+            return
         if path == '/article/entity-queue':
             self.serve_queue(articles, inbound_count, pattern, name_to_slug)
             return
@@ -476,6 +500,27 @@ class WikiHandler(BaseHTTPRequestHandler):
             body.append('</li>')
         body.append('</ul></div>')
         self.respond_html(render_page('Entity Queue', '\n'.join(body)))
+
+    def serve_campaign_timeline(self):
+        if CAMPAIGN_TIMELINE_PATH.exists():
+            md_text = load_markdown(CAMPAIGN_TIMELINE_PATH)
+            body = (
+                "<h1>Campaign Timeline</h1>"
+                "<p>First introductions for campaign entities, rendered from Mermaid markdown.</p>"
+                f"<div class='meta'>Source: <code>{html.escape(str(CAMPAIGN_TIMELINE_PATH))}</code></div>"
+                + markdown_to_html(md_text)
+            )
+        else:
+            body = (
+                "<h1>Campaign Timeline</h1>"
+                "<div class='card'>"
+                "<p>The campaign intro timeline has not been generated yet.</p>"
+                "<p class='meta'>Run one of these commands, then refresh this page:</p>"
+                "<pre><code>python3 03_organization/build_campaign_intro_timeline.py\n"
+                "python3 scripts/build_campaign_intro_timeline.py</code></pre>"
+                "</div>"
+            )
+        self.respond_html(render_page('Campaign Timeline', body))
 
     def serve_article(self, articles, inbound_count, inbound_sources, pattern, name_to_slug, slug):
         a = articles.get(slug)
