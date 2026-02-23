@@ -185,6 +185,28 @@ def build_articles() -> dict[str, Article]:
                 title = heading_title(body, base.replace('-', ' ').title())
                 articles[slug] = Article(slug, title, md_paths[0], body, category)
 
+    # Back-compat merge: also scan legacy lore/campaign trees so older data doesn't disappear.
+    for root, slug_prefix, category in [
+        (MEMORY_ROOT / 'lore', 'lore', 'general'),
+        (MEMORY_ROOT / 'campaign' / 'entities', 'campaign-entities', 'campaign'),
+        (MEMORY_ROOT / 'campaign', 'campaign', 'campaign'),
+    ]:
+        if not root.exists():
+            continue
+        for md in sorted(root.rglob('*.md')):
+            # Avoid duplicating request docs and nested entity duplicates handled elsewhere
+            if 'requests' in md.parts:
+                continue
+            if root == (MEMORY_ROOT / 'campaign') and 'entities' in md.parts:
+                continue
+            rel = md.relative_to(root)
+            slug = f"{slug_prefix}-" + '-'.join(rel.with_suffix('').parts).lower().replace('_', '-')
+            if slug in articles:
+                continue
+            text_md = load_markdown(md)
+            title = heading_title(text_md, rel.stem.replace('_', ' ').title())
+            articles[slug] = Article(slug, title, md, text_md, category)
+
     for root, slug_prefix, category in [
         (MEMORY_ROOT / 'topics', 'topics', 'general'),
         (CONSOLIDATED_ROOT / 'sessions', 'sessions', 'campaign'),
