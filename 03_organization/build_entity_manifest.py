@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -49,15 +50,30 @@ def collect(scope: str, root: Path):
     return rows
 
 
+def norm_entity_key(name: str) -> str:
+    s = (name or '').strip().lower()
+    s = re.sub(r'^entity\s*:\s*', '', s)
+    s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+    return s
+
+
 def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    rows = []
-    rows += collect('campaign', CONSOLIDATED_ROOT / 'campaign' / 'entities')
-    rows += collect('general', CONSOLIDATED_ROOT / 'general' / 'entities')
+
+    campaign_rows = collect('campaign', CONSOLIDATED_ROOT / 'campaign' / 'entities')
+    general_rows = collect('general', CONSOLIDATED_ROOT / 'general' / 'entities')
+
+    general_keys = {norm_entity_key(r['entity']) for r in general_rows}
+    filtered_campaign = [r for r in campaign_rows if norm_entity_key(r['entity']) not in general_keys]
+
+    rows = filtered_campaign + general_rows
+
     with OUT.open('w', encoding='utf-8') as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + '\n')
-    print(f'wrote {len(rows)} rows -> {OUT}')
+
+    skipped = len(campaign_rows) - len(filtered_campaign)
+    print(f'wrote {len(rows)} rows -> {OUT} (skipped {skipped} campaign duplicates with general scope)')
 
 
 if __name__ == '__main__':

@@ -257,6 +257,13 @@ def load_manifest_rows():
     return rows
 
 
+def norm_entity_key(name: str) -> str:
+    s = (name or '').strip().lower()
+    s = re.sub(r'^entity\s*:\s*', '', s)
+    s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+    return s
+
+
 def aggregate_entity_markdown(md_paths: list[Path]) -> str:
     parts = []
     for mp in sorted(md_paths, key=lambda x: x.name.lower()):
@@ -276,7 +283,12 @@ def build_articles() -> dict[str, Article]:
     articles['cindy-lou-jenkins'] = Article('cindy-lou-jenkins', 'Cindy Lou Jenkins', None, cindy_body, 'core')
 
     manifest_rows = load_manifest_rows()
+    general_manifest_keys = set()
     if manifest_rows:
+        for row in manifest_rows:
+            if str(row.get('scope', '')).strip().lower() == 'general':
+                general_manifest_keys.add(norm_entity_key(str(row.get('entity', ''))))
+
         for row in manifest_rows:
             entity = row.get('entity', '').strip()
             scope = row.get('scope', '').strip().lower()
@@ -284,6 +296,10 @@ def build_articles() -> dict[str, Article]:
             jsonl_files = [Path(x) for x in row.get('jsonl_files', []) if str(x).strip()]
             if not entity or not md_files:
                 continue
+
+            if scope == 'campaign' and norm_entity_key(entity) in general_manifest_keys:
+                continue
+
             slug_base = entity.replace('_', '-').lower()
             if scope == 'campaign':
                 slug = f'campaign-entities-{slug_base}'
@@ -343,6 +359,9 @@ def build_articles() -> dict[str, Article]:
 
             slug = f"{slug_prefix}-" + '-'.join(rel.with_suffix('').parts).lower().replace('_', '-')
             if slug in articles:
+                continue
+
+            if slug_prefix in {'campaign-entities', 'campaign'} and norm_entity_key(rel.stem) in general_manifest_keys:
                 continue
             text_md = load_markdown(md)
             title = heading_title(text_md, rel.stem.replace('_', ' ').title())
