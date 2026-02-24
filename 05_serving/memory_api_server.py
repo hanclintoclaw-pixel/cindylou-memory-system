@@ -84,6 +84,14 @@ class Handler(BaseHTTPRequestHandler):
             result = _mod.rebuild(target=target, scope=scope)
             return self._json(200 if result.get("ok") else 500, result)
 
+        if parsed.path == "/restart":
+            result = _mod.restart(
+                service=body.get("service", "all"),
+                wiki_port=int(body.get("wiki_port", 8889)),
+                api_port=int(body.get("api_port", 8091)),
+            )
+            return self._json(200 if result.get("ok") else 500, result)
+
         return self._json(404, {"error": "not_found"})
 
 

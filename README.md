@@ -54,6 +54,7 @@ python3 cindylou.py search --type keyword --q "otaku" --scope sr3_rules
 python3 cindylou.py search --type semantic --q "who rescued cindy lou" --scope campaign
 python3 cindylou.py get campaign/entities/mevin.md
 python3 cindylou.py upsert-fact --json '{"entity":"Mevin Kitnick","fact":"Rescued Cindy Lou from obsessed fans"}'
+python3 cindylou.py restart --service all
 ```
 
 API bridge:

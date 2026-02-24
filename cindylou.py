@@ -26,6 +26,7 @@ semantic_search = _mod.semantic_search
 upsert_fact = _mod.upsert_fact
 queue_entity = _mod.queue_entity
 rebuild = _mod.rebuild
+restart = _mod.restart
 
 
 def cmd_search(args):
@@ -71,6 +72,10 @@ def cmd_rebuild(args):
     print(json.dumps(rebuild(target=args.target or "", scope=args.scope), ensure_ascii=False, indent=2))
 
 
+def cmd_restart(args):
+    print(json.dumps(restart(service=args.service, wiki_port=args.wiki_port, api_port=args.api_port), ensure_ascii=False, indent=2))
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="cindylou", description="Cindy Lou memory bridge CLI")
     sub = p.add_subparsers(dest="command", required=True)
@@ -101,6 +106,12 @@ def build_parser():
     r.add_argument("--target", help="optional entity target name")
     r.add_argument("--scope", choices=["all", "campaign", "entity"], default="all")
     r.set_defaults(func=cmd_rebuild)
+
+    rs = sub.add_parser("restart", help="restart memory-system local services")
+    rs.add_argument("--service", choices=["all", "wiki", "api"], default="all")
+    rs.add_argument("--wiki-port", type=int, default=8889)
+    rs.add_argument("--api-port", type=int, default=8091)
+    rs.set_defaults(func=cmd_restart)
 
     return p
 

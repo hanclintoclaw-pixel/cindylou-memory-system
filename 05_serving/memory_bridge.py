@@ -174,6 +174,39 @@ def queue_entity(payload: dict) -> dict:
     return {"ok": True, "written": str(queue_file)}
 
 
+def _start_service(cmd: list[str], log_name: str) -> dict:
+    AUDIT_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = AUDIT_DIR / log_name
+    with log_path.open("a", encoding="utf-8") as logf:
+        proc = subprocess.Popen(cmd, cwd=str(REPO_ROOT), stdout=logf, stderr=logf, start_new_session=True)
+    return {"pid": proc.pid, "log": str(log_path), "cmd": " ".join(cmd)}
+
+
+def restart(service: str = "all", wiki_port: int = 8889, api_port: int = 8091) -> dict:
+    service = (service or "all").lower()
+    actions = []
+
+    if service in {"all", "wiki"}:
+        pat = str(REPO_ROOT / "05_serving" / "knowledge_wiki_server.py")
+        subprocess.run(["pkill", "-f", pat], capture_output=True)
+        started = _start_service(
+            ["python3", str(REPO_ROOT / "05_serving" / "knowledge_wiki_server.py"), "--port", str(wiki_port)],
+            "knowledge_wiki_server.log",
+        )
+        actions.append({"service": "wiki", "status": "restarted", **started})
+
+    if service in {"all", "api"}:
+        pat = str(REPO_ROOT / "05_serving" / "memory_api_server.py")
+        subprocess.run(["pkill", "-f", pat], capture_output=True)
+        started = _start_service(
+            ["python3", str(REPO_ROOT / "05_serving" / "memory_api_server.py"), "--port", str(api_port)],
+            "memory_api_server.log",
+        )
+        actions.append({"service": "api", "status": "restarted", **started})
+
+    return {"ok": True, "service": service, "actions": actions}
+
+
 def rebuild(target: str = "", scope: str = "all") -> dict:
     scope = (scope or "all").lower()
     cmds: list[list[str]] = []
