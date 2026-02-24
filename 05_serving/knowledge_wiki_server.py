@@ -10,6 +10,7 @@ import re
 import secrets
 import sys
 import time
+import uuid
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -36,6 +37,7 @@ MANIFEST_PATH = CONSOLIDATED_ROOT / 'entity_manifest.jsonl'
 CAMPAIGN_TIMELINE_PATH = MEMORY_ROOT / '90_derived' / 'CAMPAIGN_INTRO_TIMELINE.md'
 QUEUE_FILE = MEMORY_ROOT / 'entity_request_queue.jsonl'
 PLAYER_INPUT_FILE = MEMORY_ROOT / 'player_input' / 'submissions.jsonl'
+PLAYER_AUDIT_FILE = MEMORY_ROOT / 'player_input' / 'request_audit.jsonl'
 DEBUG_SOURCE_ROOTS = [MEMORY_ROOT, P.raw_root, P.cleaned_root, P.data_root]
 WIKI_PASSWORD = os.environ.get('WIKI_PASSWORD', 'neilbreen')
 SESSION_COOKIE = 'cindywiki_session'
@@ -78,7 +80,7 @@ def read_queue():
     return rows
 
 
-def append_queue(entity: str, note: str = ''):
+def append_queue(entity: str, note: str = '', source_submission_id: str = '', submitter: str = ''):
     QUEUE_FILE.parent.mkdir(parents=True, exist_ok=True)
     now = int(time.time())
     obj = {
@@ -88,6 +90,8 @@ def append_queue(entity: str, note: str = ''):
         'entity': entity.strip(),
         'note': note.strip(),
         'status': 'incoming',
+        'source_submission_id': source_submission_id.strip() if source_submission_id else '',
+        'submitter': submitter.strip() if submitter else '',
         'history': [
             {'ts': now, 'event': 'incoming', 'detail': 'added via web queue'}
         ],
@@ -101,6 +105,20 @@ def read_player_input():
         return []
     rows = []
     for line in PLAYER_INPUT_FILE.read_text(encoding='utf-8', errors='replace').splitlines():
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except Exception:
+            continue
+    return rows
+
+
+def read_player_audit():
+    if not PLAYER_AUDIT_FILE.exists():
+        return []
+    rows = []
+    for line in PLAYER_AUDIT_FILE.read_text(encoding='utf-8', errors='replace').splitlines():
         if not line.strip():
             continue
         try:
@@ -186,8 +204,11 @@ def gather_data_sources():
 
 def append_player_input(entity: str, player: str, note: str, request_type: str = 'fact'):
     PLAYER_INPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    now = int(time.time())
+    submission_id = f"sub-{uuid.uuid4().hex[:10]}"
     obj = {
-        'ts': int(time.time()),
+        'submission_id': submission_id,
+        'ts': now,
         'date': time.strftime('%Y-%m-%d %H:%M:%S'),
         'entity': entity.strip(),
         'player': player.strip() or 'Unknown Player',
@@ -197,6 +218,7 @@ def append_player_input(entity: str, player: str, note: str, request_type: str =
     }
     with PLAYER_INPUT_FILE.open('a', encoding='utf-8') as f:
         f.write(json.dumps(obj, ensure_ascii=False) + '\n')
+    return submission_id
 
 
 def list_entity_choices(articles: dict[str, Article]):
@@ -565,9 +587,9 @@ class WikiHandler(BaseHTTPRequestHandler):
             request_type = (form.get('request_type', ['fact'])[0] or 'fact').strip()
             target_slug = (form.get('target_slug', [''])[0] or '').strip()
             if entity and note:
-                append_player_input(entity, player, note, request_type)
+                submission_id = append_player_input(entity, player, note, request_type)
                 if request_type in {'research', 'update', 'question'}:
-                    append_queue(entity, f"[{player or 'Unknown Player'}] {note}")
+                    append_queue(entity, f"[{player or 'Unknown Player'}] {note}", source_submission_id=submission_id, submitter=(player or 'Unknown Player'))
             redirect = f"/article/{target_slug}" if target_slug else '/article/entity-queue'
             self.send_response(303)
             self.send_header('Location', redirect)
@@ -729,6 +751,52 @@ class WikiHandler(BaseHTTPRequestHandler):
                 if not items:
                     body.append("<p class='meta'>No entries found.</p></details>")
                     continue
+                if parent == 'Campaign' and sub == 'Web Submissions':
+                    submissions = sorted(read_player_input(), key=lambda r: r.get('ts', 0), reverse=True)
+                    audit_rows = read_player_audit()
+                    by_sub = {}
+                    for a in audit_rows:
+                        sid = a.get('submission_id')
+                        if not sid:
+                            continue
+                        by_sub.setdefault(sid, []).append(a)
+
+                    body.append('<ul>')
+                    for s in submissions:
+                        sid = s.get('submission_id', '')
+                        date = s.get('date', '')
+                        subject = s.get('entity', '(unknown subject)')
+                        user = s.get('player', 'Unknown Player')
+                        prompt = s.get('note', '')
+                        body.append(f"<li><strong>{html.escape(subject)}</strong> <span class='meta'>by {html.escape(user)} on {html.escape(date)}</span>")
+                        body.append('<details><summary>Request + Audit</summary>')
+                        body.append(f"<div class='meta'><strong>Prompt:</strong> {html.escape(prompt)}</div>")
+                        audits = sorted(by_sub.get(sid, []), key=lambda a: a.get('ts', 0))
+                        if audits:
+                            for a in audits:
+                                ats = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(a.get('ts', 0))) if a.get('ts') else ''
+                                acts = ', '.join(a.get('actions', [])) if isinstance(a.get('actions'), list) else ''
+                                body.append(f"<div class='card'><div class='meta'><strong>{html.escape(ats)}</strong> — {html.escape(a.get('status',''))}</div>")
+                                if acts:
+                                    body.append(f"<div class='meta'><strong>Work log:</strong> {html.escape(acts)}</div>")
+                                edits = a.get('edited_docs', []) if isinstance(a.get('edited_docs', list)) else []
+                                if edits:
+                                    body.append('<ul>')
+                                    for e in edits:
+                                        pth = str(e.get('path',''))
+                                        href = f"/debug/source?path={quote(pth)}" if pth else '#'
+                                        body.append(f"<li><a href='{href}'>{html.escape(Path(pth).name if pth else 'edited document')}</a></li>")
+                                        d = e.get('diff','')
+                                        if d:
+                                            body.append(f"<pre><code>{html.escape(d[:4000])}</code></pre>")
+                                    body.append('</ul>')
+                                body.append('</div>')
+                        else:
+                            body.append("<div class='meta'>No processing audit yet.</div>")
+                        body.append('</details></li>')
+                    body.append('</ul></details>')
+                    continue
+
                 body.append('<ul>')
                 for p in items:
                     href = f"/debug/source?path={quote(str(p))}"

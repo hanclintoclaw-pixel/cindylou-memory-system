@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import difflib
 import json
 import re
 import sys
@@ -17,6 +18,7 @@ CAMP = P.memory_root / 'campaign'
 CAMP_ENT = CAMP / 'entities'
 REQ_ENT = CAMP / 'requests'
 CATALOG = CAMP / 'entity_catalog.json'
+AUDIT = P.memory_root / 'player_input' / 'request_audit.jsonl'
 CAMP_ENT.mkdir(parents=True, exist_ok=True)
 REQ_ENT.mkdir(parents=True, exist_ok=True)
 GAME_LOGS = P.raw_root / 'Game_Logs'
@@ -79,6 +81,15 @@ def load_catalog():
 def save_catalog(rows):
     CATALOG.parent.mkdir(parents=True, exist_ok=True)
     CATALOG.write_text(json.dumps(rows, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+
+
+def append_audit_event(submission_id: str, payload: dict):
+    if not submission_id:
+        return
+    AUDIT.parent.mkdir(parents=True, exist_ok=True)
+    row = {'submission_id': submission_id, **payload}
+    with AUDIT.open('a', encoding='utf-8') as f:
+        f.write(json.dumps(row, ensure_ascii=False) + '\n')
 
 
 def resolve_canonical(entity: str, catalog):
@@ -189,6 +200,13 @@ def main():
         r['status'] = 'in_progress'
         r['started_at'] = r.get('started_at') or int(time.time())
 
+        action_log = [
+            'queue lookup',
+            'entity canonicalization',
+            'memory corpus mention scan (campaign logs + harmonized rules corpus)',
+        ]
+        submission_id = (r.get('source_submission_id') or '').strip()
+
         match = resolve_canonical(entity, catalog)
         if match:
             canonical = match['canonical']
@@ -199,6 +217,7 @@ def main():
             catalog.append({'canonical': canonical, 'type': 'Unknown', 'synonyms': []})
             catalog_changed = True
             match = catalog[-1]
+            action_log.append('catalog entry created')
 
         mentions = find_mentions(terms)
         slug = slugify(canonical)
@@ -215,6 +234,14 @@ def main():
             r['resolved_entity'] = canonical
             r['output'] = str(canonical_article)
             _append_history(r, 'completed', 'already present in canonical campaign entities (integrated)')
+            append_audit_event(submission_id, {
+                'ts': int(time.time()),
+                'status': 'completed',
+                'result': 'integrated',
+                'entity': canonical,
+                'actions': action_log + ['existing entity dossier detected; no write needed'],
+                'edited_docs': [],
+            })
             queue_changed = True
             processed += 1
             continue
@@ -238,7 +265,17 @@ def main():
         for m in mentions:
             lines.append(f"- **{m['domain']}** - {m['excerpt']}")
             lines.append(f"  - Source: `{m['source']}`")
-        out.write_text('\n'.join(lines).rstrip() + '\n', encoding='utf-8')
+
+        before_text = out.read_text(encoding='utf-8', errors='replace') if out.exists() else ''
+        after_text = '\n'.join(lines).rstrip() + '\n'
+        out.write_text(after_text, encoding='utf-8')
+        diff = ''.join(difflib.unified_diff(
+            before_text.splitlines(keepends=True),
+            after_text.splitlines(keepends=True),
+            fromfile=str(out) + ':before',
+            tofile=str(out) + ':after',
+            n=3,
+        ))
 
         r['status'] = 'completed'
         r['result'] = 'researched'
@@ -247,6 +284,20 @@ def main():
         r['resolved_entity'] = canonical
         r['output'] = str(out)
         _append_history(r, 'completed', f'research dossier written ({len(mentions)} mentions)')
+        append_audit_event(submission_id, {
+            'ts': int(time.time()),
+            'status': 'completed',
+            'result': 'researched',
+            'entity': canonical,
+            'actions': action_log + [f'request dossier generated ({len(mentions)} mentions)'],
+            'edited_docs': [
+                {
+                    'path': str(out),
+                    'change_type': 'create_or_update',
+                    'diff': diff[:12000],
+                }
+            ],
+        })
         queue_changed = True
         processed += 1
 
