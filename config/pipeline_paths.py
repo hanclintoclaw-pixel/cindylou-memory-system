@@ -61,7 +61,7 @@ def get_paths() -> PipelinePaths:
     intermediates_root = pick("INTERMEDIATES_ROOT")
     cache_root = pick("CACHE_ROOT")
 
-    memory_root = Path(os.environ.get("MEMORY_ROOT", str(data_root / "memory")))
+    memory_root = Path(os.environ.get("MEMORY_ROOT", str(cleaned_root / "memory")))
     outputs_root = Path(os.environ.get("OUTPUTS_ROOT", str(intermediates_root / "outputs")))
 
     return PipelinePaths(
