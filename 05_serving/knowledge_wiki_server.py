@@ -465,7 +465,7 @@ a {{ color:#0b57d0; text-decoration:none; }} a:hover {{ text-decoration:underlin
 .nav a {{ margin-right:.8rem; }} .card {{ border:1px solid #ddd; border-radius:10px; padding:.9rem 1rem; margin:.7rem 0; }}
 .meta {{ color:#555; font-size:.93rem; margin-bottom:.7rem; }}
 code {{ background:#f5f5f5; padding:0 .2rem; border-radius:4px; }}
-pre {{ background:#111; color:#eaeaea; padding:.8rem; border-radius:8px; overflow:auto; }}
+pre {{ background:#f6f8fa; color:#1f2328; padding:.8rem; border-radius:8px; overflow:auto; border:1px solid #d0d7de; }}
 .mermaid {{ background:#fff; border:1px solid #ddd; border-radius:8px; padding:.75rem; overflow:auto; }}
 input, textarea {{ width:100%; padding:.5rem; margin:.25rem 0 .6rem 0; }}
 button {{ padding:.5rem .75rem; }}
@@ -826,9 +826,24 @@ class WikiHandler(BaseHTTPRequestHandler):
             self.respond_html(render_page('Source Debug', body))
             return
 
-        max_lines = 1400
-        raw_lines = p.read_text(encoding='utf-8', errors='replace').splitlines()
+        text = p.read_text(encoding='utf-8', errors='replace')
         target_line = int(line_param) if line_param.isdigit() else None
+        line_note = f" | Line: <strong>{target_line}</strong>" if target_line else ''
+
+        if p.suffix.lower() in {'.md', '.markdown'}:
+            rendered = link_source_citations(markdown_to_html(text))
+            body = (
+                '<h1>Source Debug View</h1>'
+                f"<div class='meta'>Source: <code>{html.escape(str(p))}</code>{line_note}{section_note}</div>"
+                "<div class='card'><p class='meta'>Rendered as Markdown.</p></div>"
+                f"<div class='card'>{rendered}</div>"
+            )
+            self.respond_html(render_page('Source Debug', body))
+            return
+
+        # Fallback for non-markdown text formats (jsonl/txt/etc.)
+        raw_lines = text.splitlines()
+        max_lines = 1400
         start = 0
         if target_line and target_line > 40:
             start = max(0, target_line - 40)
@@ -840,7 +855,6 @@ class WikiHandler(BaseHTTPRequestHandler):
             numbered.append(f"{mark}{idx:5d}: {ln}")
         content = '\n'.join(numbered)
 
-        line_note = f" | Line: <strong>{target_line}</strong>" if target_line else ''
         body = (
             '<h1>Source Debug View</h1>'
             f"<div class='meta'>Source: <code>{html.escape(str(p))}</code>{line_note}{section_note}</div>"
