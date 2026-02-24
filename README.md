@@ -45,6 +45,22 @@ python3 03_organization/build_campaign_intro_timeline.py
 Serving:
 ```bash
 python3 05_serving/knowledge_wiki_server.py --port 8080
+python3 05_serving/memory_api_server.py --port 8091
+```
+
+CLI bridge:
+```bash
+python3 cindylou.py search --type keyword --q "otaku" --scope sr3_rules
+python3 cindylou.py search --type semantic --q "who rescued cindy lou" --scope campaign
+python3 cindylou.py get campaign/entities/mevin.md
+python3 cindylou.py upsert-fact --json '{"entity":"Mevin Kitnick","fact":"Rescued Cindy Lou from obsessed fans"}'
+```
+
+API bridge:
+```bash
+curl -s http://127.0.0.1:8091/health
+curl -s -X POST http://127.0.0.1:8091/search -H 'content-type: application/json' -d '{"query":"semi-autonomous knowbot","mode":"keyword","scope":"sr3_rules"}'
+curl -s -X POST http://127.0.0.1:8091/facts -H 'content-type: application/json' -d '{"entity":"Mevin Kitnick","fact":"Rescued Cindy Lou"}'
 ```
 
 Legacy entrypoints in `scripts/` still work:
