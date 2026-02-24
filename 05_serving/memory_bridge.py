@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Iterable
 from config.pipeline_paths import get_paths
 
 P = get_paths()
+REPO_ROOT = Path(P.repo_root)
 MEMORY_ROOT = Path(P.memory_root)
 AUDIT_DIR = P.data_root / "logs"
 AUDIT_FILE = AUDIT_DIR / "memory_upserts.jsonl"
@@ -170,3 +172,32 @@ def queue_entity(payload: dict) -> dict:
     with queue_file.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
     return {"ok": True, "written": str(queue_file)}
+
+
+def rebuild(target: str = "", scope: str = "all") -> dict:
+    scope = (scope or "all").lower()
+    cmds: list[list[str]] = []
+
+    kb_cmd = ["python3", str(REPO_ROOT / "03_organization" / "build_campaign_kb.py")]
+    if target.strip():
+        kb_cmd += ["--target", target.strip()]
+
+    if scope in {"all", "campaign", "entity"}:
+        cmds.append(kb_cmd)
+    if scope in {"all", "campaign"}:
+        cmds.append(["python3", str(REPO_ROOT / "03_organization" / "build_entity_manifest.py")])
+        cmds.append(["python3", str(REPO_ROOT / "03_organization" / "build_campaign_intro_timeline.py")])
+
+    ran = []
+    for cmd in cmds:
+        proc = subprocess.run(cmd, cwd=str(REPO_ROOT), capture_output=True, text=True)
+        ran.append({
+            "cmd": " ".join(cmd),
+            "code": proc.returncode,
+            "stdout": (proc.stdout or "").strip(),
+            "stderr": (proc.stderr or "").strip(),
+        })
+        if proc.returncode != 0:
+            return {"ok": False, "target": target, "scope": scope, "runs": ran}
+
+    return {"ok": True, "target": target, "scope": scope, "runs": ran}

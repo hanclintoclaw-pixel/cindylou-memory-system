@@ -8,6 +8,7 @@ import json
 import os
 import re
 import secrets
+import subprocess
 import sys
 import time
 import uuid
@@ -219,6 +220,19 @@ def append_player_input(entity: str, player: str, note: str, request_type: str =
     with PLAYER_INPUT_FILE.open('a', encoding='utf-8') as f:
         f.write(json.dumps(obj, ensure_ascii=False) + '\n')
     return submission_id
+
+
+def trigger_rebuild(target: str = '', scope: str = 'entity'):
+    cmd = [
+        'python3',
+        str(REPO_ROOT / 'cindylou.py'),
+        'rebuild',
+        '--scope', scope,
+    ]
+    if target.strip():
+        cmd.extend(['--target', target.strip()])
+    proc = subprocess.run(cmd, cwd=str(REPO_ROOT), capture_output=True, text=True)
+    return proc.returncode == 0
 
 
 def list_entity_choices(articles: dict[str, Article]):
@@ -596,6 +610,18 @@ class WikiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
+        if parsed.path == '/rebuild-entity':
+            target = (form.get('target', [''])[0] or '').strip()
+            slug = (form.get('target_slug', [''])[0] or '').strip()
+            ok = trigger_rebuild(target=target, scope='entity')
+            redirect = f"/article/{slug}" if slug else '/'
+            if ok:
+                redirect += ('&' if '?' in redirect else '?') + 'rebuilt=1'
+            self.send_response(303)
+            self.send_header('Location', redirect)
+            self.end_headers()
+            return
+
         self.send_error(404, 'Not found')
 
     def do_GET(self):
@@ -939,7 +965,19 @@ class WikiHandler(BaseHTTPRequestHandler):
         linked_html, refs = autolink_html(raw_html, slug, pattern, name_to_slug)
         linked_html = link_source_citations(linked_html)
         entity_name = a.title.replace('Campaign NPC: ', '').replace('Campaign PC: ', '').replace('Campaign Entity: ', '').strip()
+        rebuild_form = ''
+        if slug.startswith('campaign-entities-') or slug == 'cindy-lou-jenkins':
+            rebuild_form = (
+                '<div class="card"><h3>Rebuild Now</h3>'
+                '<form method="POST" action="/rebuild-entity">'
+                f'<input type="hidden" name="target_slug" value="{html.escape(slug)}" />'
+                f'<input type="hidden" name="target" value="{html.escape(entity_name)}" />'
+                '<button type="submit">Rebuild memory for this entity</button>'
+                '</form></div>'
+            )
+
         input_form = (
+            rebuild_form +
             '<div class="card"><h3>Contribute / Request Update</h3>'
             '<form method="POST" action="/player-input-add">'
             f'<input type="hidden" name="target_slug" value="{html.escape(slug)}" />'

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import re
 import sys
@@ -249,7 +250,19 @@ def _line_with_context(lines: list[str], i: int) -> str:
     return text[:420]
 
 
-def main():
+def _matches_target(canonical: str, target: str | None) -> bool:
+    if not target:
+        return True
+    t = target.strip().lower()
+    c = canonical.strip().lower()
+    if t == c:
+        return True
+    if t in c:
+        return True
+    return slugify(canonical) == slugify(target)
+
+
+def main(target: str | None = None):
     catalog = load_catalog(CATALOG)
     patterns = build_alias_patterns(catalog)
     logs = sorted(GAME_LOGS.glob('*.md'))
@@ -353,6 +366,8 @@ def main():
     idx_md.write_text('\n'.join(lines).rstrip() + '\n', encoding='utf-8')
 
     for canonical, refs in entity_refs.items():
+        if not _matches_target(canonical, target):
+            continue
         meta = entity_meta[canonical]
         slug = slugify(canonical)
         p = ENT / f'{slug}.md'
@@ -467,4 +482,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--target', help='Canonical entity name (or partial) to rebuild specific campaign entity page(s).')
+    args = ap.parse_args()
+    main(target=args.target)

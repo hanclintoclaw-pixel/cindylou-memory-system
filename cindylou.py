@@ -25,6 +25,7 @@ keyword_search = _mod.keyword_search
 semantic_search = _mod.semantic_search
 upsert_fact = _mod.upsert_fact
 queue_entity = _mod.queue_entity
+rebuild = _mod.rebuild
 
 
 def cmd_search(args):
@@ -66,6 +67,10 @@ def cmd_queue_entity(args):
     print(json.dumps(queue_entity(payload), ensure_ascii=False, indent=2))
 
 
+def cmd_rebuild(args):
+    print(json.dumps(rebuild(target=args.target or "", scope=args.scope), ensure_ascii=False, indent=2))
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="cindylou", description="Cindy Lou memory bridge CLI")
     sub = p.add_subparsers(dest="command", required=True)
@@ -91,6 +96,11 @@ def build_parser():
     q.add_argument("--json")
     q.add_argument("--json-file")
     q.set_defaults(func=cmd_queue_entity)
+
+    r = sub.add_parser("rebuild", help="rebuild campaign memory artifacts")
+    r.add_argument("--target", help="optional entity target name")
+    r.add_argument("--scope", choices=["all", "campaign", "entity"], default="all")
+    r.set_defaults(func=cmd_rebuild)
 
     return p
 

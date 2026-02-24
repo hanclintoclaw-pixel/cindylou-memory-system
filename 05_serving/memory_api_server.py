@@ -78,6 +78,12 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/entity-queue":
             return self._json(200, _mod.queue_entity(body))
 
+        if parsed.path == "/rebuild":
+            target = body.get("target", "")
+            scope = body.get("scope", "all")
+            result = _mod.rebuild(target=target, scope=scope)
+            return self._json(200 if result.get("ok") else 500, result)
+
         return self._json(404, {"error": "not_found"})
 
 
