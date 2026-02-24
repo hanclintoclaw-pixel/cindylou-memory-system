@@ -131,6 +131,18 @@ def build_intro_events() -> list[IntroEvent]:
     return events
 
 
+def _sanitize_mermaid_text(text: str) -> str:
+    # Mermaid timeline is picky; keep summaries plain and punctuation-light.
+    out = text
+    out = out.replace(":", " -")
+    out = out.replace(";", " -")
+    out = out.replace('"', "")
+    out = out.replace("`", "")
+    out = re.sub(r"[{}\[\]()<>]", "", out)
+    out = re.sub(r"\s+", " ", out).strip()
+    return out
+
+
 def summarize_session_text(md_text: str) -> str:
     lines = [ln.strip() for ln in md_text.splitlines()]
     blacklist = (
@@ -158,13 +170,12 @@ def summarize_session_text(md_text: str) -> str:
         return "Session notes available; summary pending refinement."
 
     # Build a short guessed summary from top 1-2 meaningful lines.
-    first = normalize_text(candidates[0], limit=90)
+    first = _sanitize_mermaid_text(normalize_text(candidates[0], limit=90))
     if len(candidates) > 1:
-        second = normalize_text(candidates[1], limit=70)
+        second = _sanitize_mermaid_text(normalize_text(candidates[1], limit=70))
         if second.lower() not in first.lower():
-            out = normalize_text(f"{first}; {second}", limit=120)
-            return out.replace(":", " -")
-    return first.replace(":", " -")
+            return _sanitize_mermaid_text(normalize_text(f"{first} - {second}", limit=120))
+    return first
 
 
 def build_session_events() -> list[SessionEvent]:
