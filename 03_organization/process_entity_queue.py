@@ -140,6 +140,17 @@ def find_mentions(terms, max_hits=120):
     return hits
 
 
+def _append_history(r, event, detail=''):
+    now = int(time.time())
+    hist = r.get('history')
+    if not isinstance(hist, list):
+        hist = []
+    hist.append({'ts': now, 'event': event, 'detail': detail})
+    r['history'] = hist
+    r['updated_at'] = now
+    return now
+
+
 def main():
     rows = load_queue()
     catalog = load_catalog()
@@ -147,12 +158,36 @@ def main():
     queue_changed = False
     processed = 0
 
+    # normalize legacy status schema
     for r in rows:
-        if r.get('status') != 'pending':
+        st = (r.get('status') or '').strip().lower()
+        if st in {'researched', 'integrated'}:
+            r['result'] = st
+            r['status'] = 'completed'
+            if 'completed_at' not in r:
+                r['completed_at'] = int(r.get('researched_at') or r.get('ts') or time.time())
+            if 'created_at' not in r:
+                r['created_at'] = int(r.get('ts') or time.time())
+            if 'updated_at' not in r:
+                r['updated_at'] = r['completed_at']
+            if not isinstance(r.get('history'), list):
+                r['history'] = [{'ts': r['completed_at'], 'event': 'completed', 'detail': f'migrated legacy status={st}'}]
+            queue_changed = True
+
+    for r in rows:
+        status = (r.get('status') or '').strip().lower()
+        if status not in {'incoming', 'pending'}:
             continue
         entity = r.get('entity', '').strip()
         if not entity:
             continue
+
+        # normalize legacy rows
+        if 'created_at' not in r:
+            r['created_at'] = int(r.get('ts') or time.time())
+        _append_history(r, 'in_progress', 'queue processor started work')
+        r['status'] = 'in_progress'
+        r['started_at'] = r.get('started_at') or int(time.time())
 
         match = resolve_canonical(entity, catalog)
         if match:
@@ -174,10 +209,12 @@ def main():
         if canonical_article.exists():
             if out.exists():
                 out.unlink()
-            r['status'] = 'integrated'
-            r['researched_at'] = time.time()
+            r['status'] = 'completed'
+            r['result'] = 'integrated'
+            r['completed_at'] = int(time.time())
             r['resolved_entity'] = canonical
             r['output'] = str(canonical_article)
+            _append_history(r, 'completed', 'already present in canonical campaign entities (integrated)')
             queue_changed = True
             processed += 1
             continue
@@ -186,7 +223,7 @@ def main():
             f'# Campaign Entity Dossier: {canonical}',
             '',
             f"- Pipeline status: **researched_from_queue**",
-            f"- Queue status at processing: **{r.get('status', 'pending')}**",
+            f"- Queue status at processing: **{status}**",
             f'- Entity type: **{match.get("type", "Unknown")}**',
             f"- Synonyms: {', '.join(match.get('synonyms', [])) if match.get('synonyms') else '_None_'}",
             f'- Requested as: **{entity}**',
@@ -203,10 +240,13 @@ def main():
             lines.append(f"  - Source: `{m['source']}`")
         out.write_text('\n'.join(lines).rstrip() + '\n', encoding='utf-8')
 
-        r['status'] = 'researched'
-        r['researched_at'] = time.time()
+        r['status'] = 'completed'
+        r['result'] = 'researched'
+        r['researched_at'] = int(time.time())
+        r['completed_at'] = int(time.time())
         r['resolved_entity'] = canonical
         r['output'] = str(out)
+        _append_history(r, 'completed', f'research dossier written ({len(mentions)} mentions)')
         queue_changed = True
         processed += 1
 

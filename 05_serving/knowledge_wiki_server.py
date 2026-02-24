@@ -80,11 +80,17 @@ def read_queue():
 
 def append_queue(entity: str, note: str = ''):
     QUEUE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    now = int(time.time())
     obj = {
-        'ts': int(time.time()),
+        'ts': now,
+        'created_at': now,
+        'updated_at': now,
         'entity': entity.strip(),
         'note': note.strip(),
-        'status': 'pending',
+        'status': 'incoming',
+        'history': [
+            {'ts': now, 'event': 'incoming', 'detail': 'added via web queue'}
+        ],
     }
     with QUEUE_FILE.open('a', encoding='utf-8') as f:
         f.write(json.dumps(obj, ensure_ascii=False) + '\n')
