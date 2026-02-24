@@ -448,13 +448,15 @@ def link_source_citations(html_text: str) -> str:
     return code_re.sub(repl, html_text)
 
 
-def render_login(error: str = ''):
+def render_login(error: str = '', next_path: str = '/'):
     err = f"<p style='color:#b00020'>{html.escape(error)}</p>" if error else ''
+    if not next_path or not str(next_path).startswith('/'):
+        next_path = '/'
     return f"""<!doctype html><html><head><meta charset=\"utf-8\" /><title>Cindy Wiki Login</title>
 <style>body {{ font-family: -apple-system, system-ui, sans-serif; max-width: 460px; margin: 4rem auto; padding: 0 1rem; }}
 .card {{ border:1px solid #ddd; border-radius:10px; padding:1rem; }} input {{ width:100%; padding:.55rem; margin:.4rem 0 .8rem 0; }} button {{ padding:.5rem .8rem; }}</style>
 </head><body><div class='card'><h2>Cindy Knowledge Wiki</h2><p>Password required.</p>{err}
-<form method='POST' action='/login'><input type='password' name='password' placeholder='Password' autofocus required />
+<form method='POST' action='/login'><input type='hidden' name='next' value='{html.escape(next_path)}' /><input type='password' name='password' placeholder='Password' autofocus required />
 <button type='submit'>Unlock</button></form></div></body></html>"""
 
 
@@ -522,7 +524,7 @@ class WikiHandler(BaseHTTPRequestHandler):
     def require_auth_or_login(self):
         if self.is_authenticated():
             return True
-        self.respond_html(render_login())
+        self.respond_html(render_login(next_path=self.path or '/'))
         return False
 
     def do_POST(self):
@@ -533,15 +535,18 @@ class WikiHandler(BaseHTTPRequestHandler):
 
         if parsed.path == '/login':
             pw = (form.get('password', [''])[0] or '')
+            next_path = (form.get('next', ['/'])[0] or '/')
+            if not next_path.startswith('/'):
+                next_path = '/'
             if hashlib.sha256(pw.encode()).hexdigest() == hashlib.sha256(WIKI_PASSWORD.encode()).hexdigest():
                 token = secrets.token_urlsafe(24)
                 SESSIONS[token] = int(time.time()) + SESSION_TTL_SEC
                 self.send_response(303)
                 self.send_header('Set-Cookie', f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; SameSite=Lax")
-                self.send_header('Location', '/')
+                self.send_header('Location', next_path)
                 self.end_headers()
             else:
-                self.respond_html(render_login('Invalid password.'))
+                self.respond_html(render_login('Invalid password.', next_path=next_path))
             return
 
         if not self.is_authenticated():
@@ -581,7 +586,8 @@ class WikiHandler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path == '/login':
-            self.respond_html(render_login())
+            next_path = (parse_qs(parsed.query).get('next', ['/'])[0] or '/')
+            self.respond_html(render_login(next_path=next_path))
             return
 
         if not self.require_auth_or_login():
