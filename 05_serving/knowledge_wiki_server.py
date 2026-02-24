@@ -237,6 +237,16 @@ def build_articles() -> dict[str, Article]:
             if root == (MEMORY_ROOT / 'campaign') and 'entities' in md.parts:
                 continue
             rel = md.relative_to(root)
+
+            # Back-compat entity subdocs (e.g. harac.timeline.md) should not become separate articles
+            # when aggregated manifest-backed entity pages already exist.
+            stem = rel.stem
+            if root in {MEMORY_ROOT / 'campaign' / 'entities', MEMORY_ROOT / 'lore' / 'entities'} and '.' in stem:
+                base = stem.split('.', 1)[0].replace('_', '-').lower()
+                agg_slug = f"{slug_prefix}-{base}"
+                if agg_slug in articles:
+                    continue
+
             slug = f"{slug_prefix}-" + '-'.join(rel.with_suffix('').parts).lower().replace('_', '-')
             if slug in articles:
                 continue
