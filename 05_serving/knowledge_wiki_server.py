@@ -126,6 +126,69 @@ def safe_source_path(path_value: str | None) -> Path | None:
     return None
 
 
+def gather_data_sources():
+    groups: dict[str, list[Path]] = {
+        'Shadowrun 3e Source Books': [],
+        'Adventures': [],
+        'Core Rules': [],
+        'Player Aids': [],
+        'Sourcebooks': [],
+        'Campaign': [],
+        'Historical Run Notes': [],
+        'Transcripts': [],
+        'Player Inputs': [],
+    }
+
+    sr_root = P.raw_root / 'Shadowrun_3e_Rules_Library'
+    if sr_root.exists():
+        for p in sr_root.rglob('*'):
+            if not p.is_file():
+                continue
+            low = str(p).lower()
+            if not any(low.endswith(ext) for ext in ('.pdf', '.md', '.txt', '.jsonl')):
+                continue
+            groups['Shadowrun 3e Source Books'].append(p)
+            if 'adventure' in low or 'module' in low:
+                groups['Adventures'].append(p)
+            elif 'core' in low or 'rulebook' in low or 'sr3' in low:
+                groups['Core Rules'].append(p)
+            elif 'aid' in low or 'quick' in low or 'reference' in low or 'screen' in low:
+                groups['Player Aids'].append(p)
+            else:
+                groups['Sourcebooks'].append(p)
+
+    campaign_root = MEMORY_ROOT / '10_consolidated' / 'campaign'
+    if campaign_root.exists():
+        groups['Campaign'].extend([p for p in campaign_root.rglob('*.md') if p.is_file()])
+
+    run_notes = MEMORY_ROOT / '00_sources' / 'run_notes'
+    if run_notes.exists():
+        groups['Historical Run Notes'].extend([p for p in run_notes.rglob('*') if p.is_file()])
+
+    transcripts = MEMORY_ROOT / '00_sources' / 'transcripts'
+    if transcripts.exists():
+        groups['Transcripts'].extend([p for p in transcripts.rglob('*') if p.is_file()])
+
+    user_inputs = MEMORY_ROOT / '00_sources' / 'user_inputs'
+    if user_inputs.exists():
+        groups['Player Inputs'].extend([p for p in user_inputs.rglob('*') if p.is_file()])
+    if PLAYER_INPUT_FILE.exists():
+        groups['Player Inputs'].append(PLAYER_INPUT_FILE)
+
+    # dedupe + stable sort
+    for k, vals in groups.items():
+        seen = set()
+        uniq = []
+        for p in vals:
+            s = str(p)
+            if s in seen:
+                continue
+            seen.add(s)
+            uniq.append(p)
+        groups[k] = sorted(uniq, key=lambda x: str(x).lower())
+    return groups
+
+
 def append_player_input(entity: str, player: str, note: str, request_type: str = 'fact'):
     PLAYER_INPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     obj = {
@@ -346,6 +409,35 @@ def autolink_html(html_text: str, current_slug: str, pattern, name_to_slug):
     return ''.join(chunks), refs
 
 
+def link_source_citations(html_text: str) -> str:
+    code_re = re.compile(r'<code>([^<]+)</code>')
+
+    def repl(m):
+        raw = html.unescape(m.group(1)).strip()
+        line_no = None
+        section = None
+        src = raw
+        lm = re.search(r'#L(\d+)$', raw)
+        if lm:
+            line_no = lm.group(1)
+            src = raw[:lm.start()]
+        pm = re.search(r'#PAGE-(\d+)$', raw)
+        if pm:
+            section = f'PAGE-{pm.group(1)}'
+            src = raw[:pm.start()]
+        p = safe_source_path(src)
+        if not p:
+            return m.group(0)
+        href = f'/debug/source?path={quote(str(p))}'
+        if line_no:
+            href += f'&line={line_no}'
+        if section:
+            href += f'&section={quote(section)}'
+        return f'<a href="{href}"><code>{html.escape(raw)}</code></a>'
+
+    return code_re.sub(repl, html_text)
+
+
 def render_login(error: str = ''):
     err = f"<p style='color:#b00020'>{html.escape(error)}</p>" if error else ''
     return f"""<!doctype html><html><head><meta charset=\"utf-8\" /><title>Cindy Wiki Login</title>
@@ -374,7 +466,7 @@ button {{ padding:.5rem .75rem; }}
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head><body>
 <div class=\"header\"><div><strong>Cindy Lou Jenkins — Knowledge Wiki</strong></div>
-<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/campaign-timeline\">Campaign Timeline</a><a href=\"/article/data-diagnostics\">Data Diagnostics</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
+<div class=\"nav\"><a href=\"/\">Front Page</a><a href=\"/article/index\">Index</a><a href=\"/article/campaign-timeline\">Campaign Timeline</a><a href=\"/article/data-sources\">Data Sources</a><a href=\"/article/data-diagnostics\">Data Diagnostics</a><a href=\"/article/entity-queue\">Entity Queue</a></div></div>
 {body_html}
 <script>
 (() => {{
@@ -513,6 +605,9 @@ class WikiHandler(BaseHTTPRequestHandler):
         if path == '/article/campaign-timeline':
             self.serve_campaign_timeline()
             return
+        if path == '/article/data-sources':
+            self.serve_data_sources()
+            return
         if path == '/article/data-diagnostics':
             self.serve_data_diagnostics(articles)
             return
@@ -582,8 +677,8 @@ class WikiHandler(BaseHTTPRequestHandler):
             body = (
                 "<h1>Campaign Timeline</h1>"
                 "<p>First introductions for campaign entities, rendered from Mermaid markdown.</p>"
-                f"<div class='meta'>Source: <code>{html.escape(str(CAMPAIGN_TIMELINE_PATH))}</code></div>"
-                + markdown_to_html(md_text)
+                f"<div class='meta'>Source: <a href='/debug/source?path={quote(str(CAMPAIGN_TIMELINE_PATH))}'><code>{html.escape(str(CAMPAIGN_TIMELINE_PATH))}</code></a></div>"
+                + link_source_citations(markdown_to_html(md_text))
             )
         else:
             body = (
@@ -596,6 +691,30 @@ class WikiHandler(BaseHTTPRequestHandler):
                 "</div>"
             )
         self.respond_html(render_page('Campaign Timeline', body))
+
+    def serve_data_sources(self):
+        groups = gather_data_sources()
+        body = [
+            '<h1>Data Sources</h1>',
+            '<p>Reference materials grouped by source type. Expand a section to browse entries and click any file to view it.</p>'
+        ]
+        ordered = [
+            'Shadowrun 3e Source Books', 'Adventures', 'Core Rules', 'Player Aids', 'Sourcebooks',
+            'Campaign', 'Historical Run Notes', 'Transcripts', 'Player Inputs'
+        ]
+        for name in ordered:
+            items = groups.get(name, [])
+            body.append(f"<details class='card'><summary><strong>{html.escape(name)}</strong> <span class='meta'>({len(items)})</span></summary>")
+            if not items:
+                body.append("<p class='meta'>No entries found.</p></details>")
+                continue
+            body.append('<ul>')
+            for p in items:
+                href = f"/debug/source?path={quote(str(p))}"
+                disp = str(p)
+                body.append(f"<li><a href='{href}'><code>{html.escape(disp)}</code></a></li>")
+            body.append('</ul></details>')
+        self.respond_html(render_page('Data Sources', ''.join(body)))
 
     def serve_data_diagnostics(self, articles):
         manifest_count = 0
@@ -625,6 +744,7 @@ class WikiHandler(BaseHTTPRequestHandler):
         cards = [
             '<h1>Data Diagnostics</h1>',
             '<p>Coverage snapshot of loaded wiki data, manifest state, and incoming suggestion queues.</p>',
+            '<p><a href="/article/data-sources">Open full Data Sources browser →</a></p>',
             '<div class="card"><h3>Loaded Articles</h3><ul>'
         ]
         for k in sorted(by_cat):
@@ -656,6 +776,8 @@ class WikiHandler(BaseHTTPRequestHandler):
     def serve_source_debug(self, parsed):
         q = parse_qs(parsed.query)
         src = (q.get('path', [''])[0] or '')
+        line_param = (q.get('line', [''])[0] or '').strip()
+        section_param = (q.get('section', [''])[0] or '').strip()
         p = safe_source_path(src)
         if not p:
             body = (
@@ -669,17 +791,26 @@ class WikiHandler(BaseHTTPRequestHandler):
             self.respond_html(render_page('Source Debug', f"<h1>Source Debug View</h1><div class='card'><p>Not found: <code>{html.escape(str(p))}</code></p></div>"))
             return
 
-        if p.suffix.lower() == '.jsonl':
-            lines = p.read_text(encoding='utf-8', errors='replace').splitlines()[:500]
-            content = '\n'.join(lines)
-        else:
-            content = p.read_text(encoding='utf-8', errors='replace')
-            lines = content.splitlines()[:1200]
-            content = '\n'.join(lines)
+        max_lines = 1400
+        raw_lines = p.read_text(encoding='utf-8', errors='replace').splitlines()
+        target_line = int(line_param) if line_param.isdigit() else None
+        start = 0
+        if target_line and target_line > 40:
+            start = max(0, target_line - 40)
+        view_lines = raw_lines[start:start + max_lines]
+
+        numbered = []
+        for idx, ln in enumerate(view_lines, start=start + 1):
+            mark = '>> ' if target_line and idx == target_line else '   '
+            numbered.append(f"{mark}{idx:5d}: {ln}")
+        content = '\n'.join(numbered)
+
+        section_note = f" | Section: <strong>{html.escape(section_param)}</strong>" if section_param else ''
+        line_note = f" | Line: <strong>{target_line}</strong>" if target_line else ''
 
         body = (
             '<h1>Source Debug View</h1>'
-            f"<div class='meta'>Source: <code>{html.escape(str(p))}</code></div>"
+            f"<div class='meta'>Source: <code>{html.escape(str(p))}</code>{line_note}{section_note}</div>"
             f"<div class='card'><pre><code>{html.escape(content)}</code></pre></div>"
         )
         self.respond_html(render_page('Source Debug', body))
@@ -691,6 +822,7 @@ class WikiHandler(BaseHTTPRequestHandler):
             return
         raw_html = markdown_to_html(a.body)
         linked_html, refs = autolink_html(raw_html, slug, pattern, name_to_slug)
+        linked_html = link_source_citations(linked_html)
         entity_name = a.title.replace('Campaign NPC: ', '').replace('Campaign PC: ', '').replace('Campaign Entity: ', '').strip()
         input_form = (
             '<div class="card"><h3>Contribute / Request Update</h3>'
