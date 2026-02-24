@@ -127,68 +127,60 @@ def safe_source_path(path_value: str | None) -> Path | None:
 
 
 def gather_data_sources():
-    groups: dict[str, list[Path]] = {
-        'Shadowrun 3e Source Books': [],
-        'Adventures': [],
-        'Core Rules': [],
-        'Player Aids': [],
-        'Sourcebooks': [],
-        'Campaign': [],
-        'Historical Run Notes': [],
-        'Transcripts': [],
-        'Player Inputs': [],
+    groups = {
+        'Shadowrun 3e Source Books': {
+            'Adventures': [],
+            'Core Rules': [],
+            'Player Aids': [],
+            'Sourcebooks': [],
+        },
+        'Campaign': {
+            'Historical Run Notes': [],
+            'Transcripts': [],
+            'Web Submissions': [],
+        },
     }
 
-    # Primary cleaned markdown source corpus
     rules_ref = MEMORY_ROOT / '00_sources' / 'rules_references'
     if rules_ref.exists():
         for p in sorted(rules_ref.rglob('source.md')):
-            groups['Shadowrun 3e Source Books'].append(p)
-            low = str(p).lower()
-            if '/adventures/' in low:
-                groups['Adventures'].append(p)
-            elif '/core_rules/' in low:
-                groups['Core Rules'].append(p)
-            elif '/player_aids/' in low:
-                groups['Player Aids'].append(p)
+            rel = p.relative_to(rules_ref)
+            cat = rel.parts[0] if rel.parts else ''
+            if cat == 'adventures':
+                groups['Shadowrun 3e Source Books']['Adventures'].append(p)
+            elif cat == 'core_rules':
+                groups['Shadowrun 3e Source Books']['Core Rules'].append(p)
+            elif cat == 'player_aids':
+                groups['Shadowrun 3e Source Books']['Player Aids'].append(p)
             else:
-                groups['Sourcebooks'].append(p)
-
-    # Optional raw PDF references (for download/debug), appended after cleaned markdown
-    sr_root = P.raw_root / 'Shadowrun_3e_Rules_Library'
-    if sr_root.exists():
-        for p in sorted(sr_root.rglob('*.pdf')):
-            groups['Shadowrun 3e Source Books'].append(p)
-
-    campaign_root = MEMORY_ROOT / '10_consolidated' / 'campaign'
-    if campaign_root.exists():
-        groups['Campaign'].extend([p for p in campaign_root.rglob('*.md') if p.is_file()])
+                groups['Shadowrun 3e Source Books']['Sourcebooks'].append(p)
 
     run_notes = MEMORY_ROOT / '00_sources' / 'run_notes'
     if run_notes.exists():
-        groups['Historical Run Notes'].extend([p for p in run_notes.rglob('*') if p.is_file()])
+        groups['Campaign']['Historical Run Notes'].extend([p for p in run_notes.rglob('*') if p.is_file()])
 
     transcripts = MEMORY_ROOT / '00_sources' / 'transcripts'
     if transcripts.exists():
-        groups['Transcripts'].extend([p for p in transcripts.rglob('*') if p.is_file()])
+        groups['Campaign']['Transcripts'].extend([p for p in transcripts.rglob('*') if p.is_file()])
 
     user_inputs = MEMORY_ROOT / '00_sources' / 'user_inputs'
     if user_inputs.exists():
-        groups['Player Inputs'].extend([p for p in user_inputs.rglob('*') if p.is_file()])
+        groups['Campaign']['Web Submissions'].extend([p for p in user_inputs.rglob('*') if p.is_file()])
     if PLAYER_INPUT_FILE.exists():
-        groups['Player Inputs'].append(PLAYER_INPUT_FILE)
+        groups['Campaign']['Web Submissions'].append(PLAYER_INPUT_FILE)
 
     # dedupe + stable sort
-    for k, vals in groups.items():
-        seen = set()
-        uniq = []
-        for p in vals:
-            s = str(p)
-            if s in seen:
-                continue
-            seen.add(s)
-            uniq.append(p)
-        groups[k] = sorted(uniq, key=lambda x: str(x).lower())
+    for parent, subs in groups.items():
+        for sub, vals in subs.items():
+            seen = set()
+            uniq = []
+            for p in vals:
+                s = str(p)
+                if s in seen:
+                    continue
+                seen.add(s)
+                uniq.append(p)
+            subs[sub] = sorted(uniq, key=lambda x: str(x).lower())
     return groups
 
 
@@ -718,24 +710,34 @@ class WikiHandler(BaseHTTPRequestHandler):
         groups = gather_data_sources()
         body = [
             '<h1>Data Sources</h1>',
-            '<p>Reference materials grouped by source type. Expand a section to browse entries and click any file to view it.</p>'
+            '<p>Reference materials grouped by source type. Expand sections to browse entries.</p>'
         ]
-        ordered = [
-            'Shadowrun 3e Source Books', 'Adventures', 'Core Rules', 'Player Aids', 'Sourcebooks',
-            'Campaign', 'Historical Run Notes', 'Transcripts', 'Player Inputs'
-        ]
-        for name in ordered:
-            items = groups.get(name, [])
-            body.append(f"<details class='card'><summary><strong>{html.escape(name)}</strong> <span class='meta'>({len(items)})</span></summary>")
-            if not items:
-                body.append("<p class='meta'>No entries found.</p></details>")
-                continue
-            body.append('<ul>')
-            for p in items:
-                href = f"/debug/source?path={quote(str(p))}"
-                disp = str(p)
-                body.append(f"<li><a href='{href}'><code>{html.escape(disp)}</code></a></li>")
-            body.append('</ul></details>')
+
+        def friendly_name(p: Path) -> str:
+            if p.name == 'source.md' and len(p.parts) >= 2:
+                return p.parent.name
+            return p.stem if p.suffix else p.name
+
+        for parent in ['Shadowrun 3e Source Books', 'Campaign']:
+            subs = groups.get(parent, {})
+            parent_total = sum(len(v) for v in subs.values())
+            body.append(f"<details class='card' open><summary><strong>{html.escape(parent)}</strong> <span class='meta'>({parent_total})</span></summary>")
+
+            for sub in subs:
+                items = subs.get(sub, [])
+                body.append(f"<details class='card'><summary>{html.escape(sub)} <span class='meta'>({len(items)})</span></summary>")
+                if not items:
+                    body.append("<p class='meta'>No entries found.</p></details>")
+                    continue
+                body.append('<ul>')
+                for p in items:
+                    href = f"/debug/source?path={quote(str(p))}"
+                    label = friendly_name(p)
+                    body.append(f"<li><a href='{href}'>{html.escape(label)}</a></li>")
+                body.append('</ul></details>')
+
+            body.append('</details>')
+
         self.respond_html(render_page('Data Sources', ''.join(body)))
 
     def serve_data_diagnostics(self, articles):
