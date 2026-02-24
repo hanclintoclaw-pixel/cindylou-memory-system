@@ -53,8 +53,19 @@ def load_catalog(path: Path):
 def build_alias_patterns(catalog):
     aliases = []
     for row in catalog:
-        for val in [row['canonical']] + row['synonyms']:
-            aliases.append((val, row['canonical']))
+        canonical = row['canonical']
+        vals = [canonical] + row['synonyms']
+
+        # Heuristic aliases for multi-word names to improve recall.
+        parts = [p for p in re.split(r'\s+', canonical.strip()) if p]
+        if len(parts) >= 2:
+            vals.append(' '.join(parts[:2]))
+        if canonical.lower().startswith('cindy lou'):
+            vals.extend(['Cindy Lou', 'Cindy Lou Prime', 'Cindy'])
+
+        for val in vals:
+            if val and val.strip():
+                aliases.append((val.strip(), canonical))
     aliases.sort(key=lambda x: len(x[0]), reverse=True)
 
     seen = set()
@@ -220,6 +231,24 @@ def summarize_entity(canonical: str, refs: list[dict], entity_type: str):
     }
 
 
+def _line_with_context(lines: list[str], i: int) -> str:
+    curr = lines[i - 1].strip()
+    prev = lines[i - 2].strip() if i - 2 >= 0 else ''
+    nxt = lines[i].strip() if i < len(lines) else ''
+
+    parts = []
+    if prev and len(prev) >= 15:
+        parts.append(prev)
+    if curr:
+        parts.append(curr)
+    if nxt and len(nxt) >= 15:
+        parts.append(nxt)
+
+    text = ' '.join(parts).strip()
+    text = re.sub(r'\s+', ' ', text)
+    return text[:420]
+
+
 def main():
     catalog = load_catalog(CATALOG)
     patterns = build_alias_patterns(catalog)
@@ -243,9 +272,10 @@ def main():
     for f in logs + wp_logs:
         txt = f.read_text(encoding='utf-8', errors='replace')
         session = extract_session_title(f)
-        for i, line in enumerate(txt.splitlines(), start=1):
+        lines = txt.splitlines()
+        for i, line in enumerate(lines, start=1):
             s = line.strip()
-            if len(s) < 25:
+            if len(s) < 12:
                 continue
             hits = []
             for canonical, pat in patterns:
@@ -254,7 +284,7 @@ def main():
             if not hits:
                 continue
 
-            rec = {'session': session, 'source_file': str(f), 'line': i, 'text': s[:320], 'entities': hits}
+            rec = {'session': session, 'source_file': str(f), 'line': i, 'text': _line_with_context(lines, i), 'entities': hits}
             entries.append(rec)
             for c in hits:
                 entity_refs[c].append(rec)

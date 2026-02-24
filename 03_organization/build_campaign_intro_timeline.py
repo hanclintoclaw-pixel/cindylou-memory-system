@@ -19,6 +19,8 @@ MEMORY_ROOT = P.cleaned_root / "memory"
 MANIFEST_PATH = MEMORY_ROOT / "10_consolidated" / "entity_manifest.jsonl"
 OUTPUT_PATH = MEMORY_ROOT / "90_derived" / "CAMPAIGN_INTRO_TIMELINE.md"
 SESSIONS_ROOT = MEMORY_ROOT / "10_consolidated" / "campaign" / "sessions"
+RUN_NOTES_ROOT = MEMORY_ROOT / "00_sources" / "run_notes"
+WP_RUN_NOTES_ROOT = MEMORY_ROOT / "wordpress_ingest" / "Run Notes"
 
 
 @dataclass
@@ -34,6 +36,7 @@ class SessionEvent:
     date: str
     summary: str
     source_path: Path
+    source_refs: list[str]
 
 
 def display_name(entity_slug: str) -> str:
@@ -178,10 +181,40 @@ def summarize_session_text(md_text: str) -> str:
     return first
 
 
+def _source_lookup() -> dict[str, Path]:
+    out: dict[str, Path] = {}
+    for root in [RUN_NOTES_ROOT, WP_RUN_NOTES_ROOT]:
+        if not root.exists():
+            continue
+        for p in root.glob("*.md"):
+            out[p.name] = p
+    return out
+
+
+def _extract_source_refs(session_text: str, src_map: dict[str, Path]) -> list[str]:
+    refs: list[str] = []
+    seen = set()
+    for raw in session_text.splitlines():
+        s = raw.strip()
+        m = re.search(r"Source:\s*`([^`]+)`", s)
+        if not m:
+            continue
+        src_name = Path(m.group(1).strip()).name
+        full = src_map.get(src_name)
+        ref = str(full) if full else src_name
+        if ref in seen:
+            continue
+        seen.add(ref)
+        refs.append(ref)
+    return refs
+
+
 def build_session_events() -> list[SessionEvent]:
     events: list[SessionEvent] = []
     if not SESSIONS_ROOT.exists():
         return events
+
+    src_map = _source_lookup()
 
     for p in sorted(SESSIONS_ROOT.glob("*.md")):
         if p.name.upper() == "SESSION_INDEX.MD":
@@ -196,6 +229,7 @@ def build_session_events() -> list[SessionEvent]:
                 date=date,
                 summary=summarize_session_text(text),
                 source_path=p,
+                source_refs=_extract_source_refs(text, src_map),
             )
         )
 
@@ -218,7 +252,17 @@ def render_markdown(events: list[IntroEvent], sessions: list[SessionEvent]) -> s
     lines.extend(["```", "", "## Session Timeline (guessed summaries)", "", "Built from `10_consolidated/campaign/sessions/*.md`.", "", "```mermaid", "timeline", "    title Campaign Sessions"])
     for sess in sessions:
         lines.append(f"    {sess.date} : {sess.summary}")
-    lines.extend(["```", ""])
+    lines.extend(["```", "", "## Session Sources", "", "Click-through references for each session timeline entry.", ""])
+    for sess in sessions:
+        lines.append(f"### {sess.date}")
+        lines.append(f"- Session file: `{sess.source_path}`")
+        if not sess.source_refs:
+            lines.append("- Sources: _none detected_")
+        else:
+            lines.append("- Sources:")
+            for ref in sess.source_refs:
+                lines.append(f"  - `{ref}`")
+        lines.append("")
     return "\n".join(lines)
 
 
