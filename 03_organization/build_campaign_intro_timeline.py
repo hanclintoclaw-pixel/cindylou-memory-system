@@ -18,6 +18,7 @@ P = get_paths()
 MEMORY_ROOT = P.cleaned_root / "memory"
 MANIFEST_PATH = MEMORY_ROOT / "10_consolidated" / "entity_manifest.jsonl"
 OUTPUT_PATH = MEMORY_ROOT / "90_derived" / "CAMPAIGN_INTRO_TIMELINE.md"
+SESSIONS_ROOT = MEMORY_ROOT / "10_consolidated" / "campaign" / "sessions"
 
 
 @dataclass
@@ -25,6 +26,13 @@ class IntroEvent:
     entity_display: str
     date_or_session: str
     text: str
+    source_path: Path
+
+
+@dataclass
+class SessionEvent:
+    date: str
+    summary: str
     source_path: Path
 
 
@@ -123,7 +131,68 @@ def build_intro_events() -> list[IntroEvent]:
     return events
 
 
-def render_markdown(events: list[IntroEvent]) -> str:
+def summarize_session_text(md_text: str) -> str:
+    lines = [ln.strip() for ln in md_text.splitlines()]
+    blacklist = (
+        "#",
+        "##",
+        "###",
+        "- source chunks:",
+        "- type:",
+        "source:",
+        "## consolidated notes",
+        "chunk",
+    )
+    candidates: list[str] = []
+    for line in lines:
+        if not line:
+            continue
+        low = line.lower()
+        if any(low.startswith(b) for b in blacklist):
+            continue
+        if len(line) < 20:
+            continue
+        candidates.append(line)
+
+    if not candidates:
+        return "Session notes available; summary pending refinement."
+
+    # Build a short guessed summary from top 1-2 meaningful lines.
+    first = normalize_text(candidates[0], limit=90)
+    if len(candidates) > 1:
+        second = normalize_text(candidates[1], limit=70)
+        if second.lower() not in first.lower():
+            out = normalize_text(f"{first}; {second}", limit=120)
+            return out.replace(":", " -")
+    return first.replace(":", " -")
+
+
+def build_session_events() -> list[SessionEvent]:
+    events: list[SessionEvent] = []
+    if not SESSIONS_ROOT.exists():
+        return events
+
+    for p in sorted(SESSIONS_ROOT.glob("*.md")):
+        if p.name.upper() == "SESSION_INDEX.MD":
+            continue
+        m = re.match(r"(20\d{2}-\d{2}-\d{2})\.md$", p.name)
+        if not m:
+            continue
+        date = m.group(1)
+        text = p.read_text(encoding="utf-8", errors="replace")
+        events.append(
+            SessionEvent(
+                date=date,
+                summary=summarize_session_text(text),
+                source_path=p,
+            )
+        )
+
+    events.sort(key=lambda e: e.date)
+    return events
+
+
+def render_markdown(events: list[IntroEvent], sessions: list[SessionEvent]) -> str:
     lines = [
         "# Campaign First Introductions Timeline",
         "",
@@ -135,15 +204,19 @@ def render_markdown(events: list[IntroEvent]) -> str:
     ]
     for event in events:
         lines.append(f"    {event.date_or_session} : {event.entity_display}: {event.text}")
+    lines.extend(["```", "", "## Session Timeline (guessed summaries)", "", "Built from `10_consolidated/campaign/sessions/*.md`.", "", "```mermaid", "timeline", "    title Campaign Sessions"])
+    for sess in sessions:
+        lines.append(f"    {sess.date} : {sess.summary}")
     lines.extend(["```", ""])
     return "\n".join(lines)
 
 
 def main():
     events = build_intro_events()
+    sessions = build_session_events()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(render_markdown(events), encoding="utf-8")
-    print(f"Wrote {len(events)} campaign introductions -> {OUTPUT_PATH}")
+    OUTPUT_PATH.write_text(render_markdown(events, sessions), encoding="utf-8")
+    print(f"Wrote {len(events)} campaign introductions + {len(sessions)} sessions -> {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":
