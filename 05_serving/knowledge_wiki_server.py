@@ -139,23 +139,26 @@ def gather_data_sources():
         'Player Inputs': [],
     }
 
-    sr_root = P.raw_root / 'Shadowrun_3e_Rules_Library'
-    if sr_root.exists():
-        for p in sr_root.rglob('*'):
-            if not p.is_file():
-                continue
-            low = str(p).lower()
-            if not any(low.endswith(ext) for ext in ('.pdf', '.md', '.txt', '.jsonl')):
-                continue
+    # Primary cleaned markdown source corpus
+    rules_ref = MEMORY_ROOT / '00_sources' / 'rules_references'
+    if rules_ref.exists():
+        for p in sorted(rules_ref.rglob('source.md')):
             groups['Shadowrun 3e Source Books'].append(p)
-            if 'adventure' in low or 'module' in low:
+            low = str(p).lower()
+            if '/adventures/' in low:
                 groups['Adventures'].append(p)
-            elif 'core' in low or 'rulebook' in low or 'sr3' in low:
+            elif '/core_rules/' in low:
                 groups['Core Rules'].append(p)
-            elif 'aid' in low or 'quick' in low or 'reference' in low or 'screen' in low:
+            elif '/player_aids/' in low:
                 groups['Player Aids'].append(p)
             else:
                 groups['Sourcebooks'].append(p)
+
+    # Optional raw PDF references (for download/debug), appended after cleaned markdown
+    sr_root = P.raw_root / 'Shadowrun_3e_Rules_Library'
+    if sr_root.exists():
+        for p in sorted(sr_root.rglob('*.pdf')):
+            groups['Shadowrun 3e Source Books'].append(p)
 
     campaign_root = MEMORY_ROOT / '10_consolidated' / 'campaign'
     if campaign_root.exists():
@@ -810,6 +813,17 @@ class WikiHandler(BaseHTTPRequestHandler):
             self.respond_html(render_page('Source Debug', f"<h1>Source Debug View</h1><div class='card'><p>Not found: <code>{html.escape(str(p))}</code></p></div>"))
             return
 
+        section_note = f" | Section: <strong>{html.escape(section_param)}</strong>" if section_param else ''
+
+        if p.suffix.lower() == '.pdf':
+            body = (
+                '<h1>Source Debug View</h1>'
+                f"<div class='meta'>Source: <code>{html.escape(str(p))}</code>{section_note}</div>"
+                f"<div class='card'><p>PDF source file.</p><p><a href='file://{quote(str(p))}'>Open/Download PDF</a></p></div>"
+            )
+            self.respond_html(render_page('Source Debug', body))
+            return
+
         max_lines = 1400
         raw_lines = p.read_text(encoding='utf-8', errors='replace').splitlines()
         target_line = int(line_param) if line_param.isdigit() else None
@@ -824,9 +838,7 @@ class WikiHandler(BaseHTTPRequestHandler):
             numbered.append(f"{mark}{idx:5d}: {ln}")
         content = '\n'.join(numbered)
 
-        section_note = f" | Section: <strong>{html.escape(section_param)}</strong>" if section_param else ''
         line_note = f" | Line: <strong>{target_line}</strong>" if target_line else ''
-
         body = (
             '<h1>Source Debug View</h1>'
             f"<div class='meta'>Source: <code>{html.escape(str(p))}</code>{line_note}{section_note}</div>"
