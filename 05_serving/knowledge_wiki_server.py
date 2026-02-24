@@ -238,9 +238,9 @@ def build_articles() -> dict[str, Article]:
     articles: dict[str, Article] = {}
 
     cindy_parts = []
-    for p in [WS / 'CHARACTER_PROFILE.md', WS / 'IDENTITY.md', WS / 'SOUL.md']:
+    for p in [WS / 'CHARACTER_PROFILE.md', WS / 'IDENTITY.md', WS / 'SOUL.md', WS / 'TOOLS.md', WS / 'USER.md']:
         if p.exists():
-            cindy_parts.append(load_markdown(p))
+            cindy_parts.append(f"## {p.name}\n\n" + load_markdown(p))
     cindy_body = '\n\n'.join(cindy_parts).strip() or '# Cindy Lou Jenkins\n\nNo profile found yet.'
     articles['cindy-lou-jenkins'] = Article('cindy-lou-jenkins', 'Cindy Lou Jenkins', None, cindy_body, 'core')
 
@@ -337,6 +337,16 @@ def build_articles() -> dict[str, Article]:
             text_md = load_markdown(md)
             title = heading_title(text_md, md.stem.replace('_', ' ').title())
             articles[slug] = Article(slug, title, md, text_md, 'campaign-queue')
+
+    # Prefer campaign dossier as canonical Cindy page when available, and fold in self-knowledge docs.
+    cindy_candidates = ['campaign-entities-cindy-lou-jenkins', 'campaign-requests-cindy-lou-jenkins']
+    for cand in cindy_candidates:
+        if cand in articles:
+            merged = articles[cand].body.rstrip() + '\n\n---\n\n# Self Knowledge Context\n\n' + cindy_body
+            articles[cand] = Article(cand, 'Campaign Entity Dossier: Cindy Lou Jenkins', articles[cand].path, merged, articles[cand].category)
+            # keep legacy front-page slug as alias
+            articles['cindy-lou-jenkins'] = Article('cindy-lou-jenkins', 'Campaign Entity Dossier: Cindy Lou Jenkins', articles[cand].path, merged, articles[cand].category)
+            break
 
     articles['index'] = Article('index', 'Index', None, '# Index\n\nBrowse every knowledge article.', 'core')
     articles['entity-queue'] = Article('entity-queue', 'Entity Request Queue', None, '# Entity Request Queue', 'core')
@@ -597,7 +607,8 @@ class WikiHandler(BaseHTTPRequestHandler):
                     inbound_sources[t].append(src)
 
         if path == '/':
-            self.serve_article(articles, inbound_count, inbound_sources, pattern, name_to_slug, 'cindy-lou-jenkins')
+            home_slug = 'campaign-entities-cindy-lou-jenkins' if 'campaign-entities-cindy-lou-jenkins' in articles else 'cindy-lou-jenkins'
+            self.serve_article(articles, inbound_count, inbound_sources, pattern, name_to_slug, home_slug)
             return
         if path == '/article/index':
             self.serve_index(articles, inbound_count)
@@ -633,6 +644,8 @@ class WikiHandler(BaseHTTPRequestHandler):
                 continue
             cards.append(f'<h2>{html.escape(cat.replace('-', ' ').title())}</h2><div class="card"><ul>')
             for slug, a in sorted(cats[cat], key=lambda x: x[1].title.lower()):
+                if slug == 'cindy-lou-jenkins' and 'campaign-entities-cindy-lou-jenkins' in articles:
+                    continue
                 cards.append(
                     f'<li><a href="/article/{quote(slug)}">{html.escape(a.title)}</a> '
                     f'<span class="meta">(referenced by {inbound_count.get(slug,0)} items)</span></li>'
