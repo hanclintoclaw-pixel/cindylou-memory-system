@@ -36,6 +36,8 @@ Organization:
 ```bash
 python3 03_organization/process_entity_queue.py
 python3 03_organization/build_campaign_kb.py
+python3 03_organization/export_sessions_to_campaign_wiki.py
+python3 03_organization/wiki_templates.py
 python3 03_organization/build_sr3_lore_kb.py
 python3 03_organization/build_sr3_topic_memory.py
 python3 03_organization/build_entity_manifest.py

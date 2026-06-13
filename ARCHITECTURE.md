@@ -46,6 +46,8 @@ Key scripts
 - `03_organization/build_sr3_topic_memory.py`
 - `03_organization/build_sr3_lore_kb.py`
 - `03_organization/build_campaign_kb.py`
+- `03_organization/export_sessions_to_campaign_wiki.py`
+- `03_organization/wiki_templates.py`
 - `03_organization/process_entity_queue.py`
 
 ## 04_caching
