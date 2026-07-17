@@ -59,6 +59,14 @@ python3 cindylou.py upsert-fact --json '{"entity":"Mevin Kitnick","fact":"Rescue
 python3 cindylou.py restart --service all
 ```
 
+Private SR3 data cache:
+```bash
+python3 scripts/import_sr3data_cache.py --refresh-source
+python3 scripts/sr3data_lookup.py smartlink --limit 5
+python3 scripts/sr3data_lookup.py manabolt --dataset spells --source-kind sr3_default
+```
+The cache is built under `/Volumes/carbonite/claw/data/cindylou/cache/sr3data/` for local tooling only. Do not publish the imported raw dataset into the campaign wiki without a rights review; use it for fast lookup and cross-check sourcebook citations against the local SR3 corpus.
+
 API bridge:
 ```bash
 curl -s http://127.0.0.1:8091/health
