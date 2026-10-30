@@ -50,6 +50,54 @@ def cmd_get(args):
     print(json.dumps(get_doc(args.doc_id, max_chars=args.max_chars), ensure_ascii=False, indent=2))
 
 
+def cmd_rules_answer(args):
+    """Page-level SR3 rules retrieval with an explicit accept/decline.
+
+    Separate from `search` because the contract is different. `search` returns a ranked
+    list and leaves the caller to decide what is good enough, which is how a whole-book
+    hit on "pistol" ended up speaking typesetting credits as a damage ruling. This returns
+    a decision: accepted is true only when at least `min_books` distinct rulebooks carry
+    the asked-about term inside the excerpt that would actually be read aloud.
+    """
+    allow = tuple(t.strip() for t in args.shape_allow.split(",") if t.strip()) or None
+    ans = _mod.page_answer(
+        query=args.q,
+        limit=args.limit,
+        min_responsive_books=args.min_books,
+        shape_allowlist=allow,
+    )
+    print(
+        json.dumps(
+            {
+                "query": args.q,
+                "accepted": ans.accepted,
+                "reason": ans.reason,
+                "responsive_books": ans.responsive_books,
+                "pages": [
+                    {
+                        "book": h.book,
+                        "section": h.section,
+                        "citation": h.citation(),
+                        "printed_page": h.printed_page,
+                        "printed_source": h.printed_source,
+                        "marker_page": h.marker_page,
+                        "score": h.score,
+                        "ruling_shape": h.ruling_shape,
+                        "ruling_hits": h.ruling_hits,
+                        "excerpt_source": h.excerpt_source,
+                        "subject": h.subject,
+                        "doc_id": h.doc_id,
+                        "excerpt": h.snippet[: args.max_chars],
+                    }
+                    for h in ans.hits[: args.limit]
+                ],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
 def _read_json_arg(args):
     if args.json:
         return json.loads(args.json)
@@ -86,6 +134,27 @@ def build_parser():
     s.add_argument("--scope", default="all", help="all|campaign|sr3_rules")
     s.add_argument("--limit", type=int, default=8)
     s.set_defaults(func=cmd_search)
+
+    ra = sub.add_parser(
+        "rules-answer",
+        help="page-level SR3 rules retrieval with an accept/decline decision",
+    )
+    ra.add_argument("--q", required=True, help="rules question, in the asker's words")
+    ra.add_argument("--limit", type=int, default=4)
+    ra.add_argument(
+        "--min-books",
+        type=int,
+        default=2,
+        help="distinct rulebooks that must independently carry the ruling (default 2)",
+    )
+    ra.add_argument("--max-chars", type=int, default=900)
+    ra.add_argument(
+        "--shape-allow",
+        default="",
+        help="comma-separated ruling shapes to accept (e.g. attribute_link,damage_code); "
+        "empty allows any shape. Pages with no shape are declined when set.",
+    )
+    ra.set_defaults(func=cmd_rules_answer)
 
     g = sub.add_parser("get", help="get document by doc_id")
     g.add_argument("doc_id")
