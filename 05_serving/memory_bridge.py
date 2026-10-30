@@ -192,12 +192,37 @@ def keyword_search(query: str, scope: str = "all", limit: int = 8) -> list[Searc
         # after the thing being asked about).
         stem = re.sub(r"[^a-z0-9]+", " ", doc.stem.lower())
         score += sum(w * 3.0 for t, w in zip(terms, idf) if t in stem)
+        # Anchor the excerpt on the most discriminative term that is actually present,
+        # not on terms[0]. first_idx used to be low.find(terms[0]) - the position of the
+        # first word the asker happened to type. "how much damage does a pistol do" is
+        # therefore anchored at the first "how" in each book: char 6,875 of the Handbook,
+        # inside the credits block, which is why that query returned "Matrix from original
+        # miteral by Paul Humel Diane Piron-Gelman" for a pistol damage question. Reordering
+        # the same query to "pistol damage how much does a do" moves the excerpt to a
+        # different part of the same document at an identical score - proof that word order,
+        # not relevance, was choosing what the table got shown.
+        #
+        # It also closes the real front-matter leak. When terms[0] is absent from a document
+        # str.find returns -1 and _snippet falls back to text[:220], i.e. the literal opening
+        # of the file - which in the OCR corpus is the mangled cover page ("O HADOWRUN
+        # T• H • İ • R • D"). That is how cover-page noise reached answers: not ranking, just
+        # an unanchored excerpt. Stripping front matter from the corpus leaves this path
+        # broken, so it had to be fixed here rather than upstream.
+        #
+        # Anchor choice cannot move a document up or down the list - it never touches score -
+        # so this changes only which 220 characters are shown. Highest IDF, then longest,
+        # then most frequent: "pistol" beats "damage" beats "how".
+        present = [(idf[i], len(t), counts[i], i) for i, t in enumerate(terms) if counts[i] > 0]
+        if present:
+            anchor_idx = text.lower().find(terms[max(present)[3]])
+        else:
+            anchor_idx = first_idx
         hits.append(
             SearchHit(
                 doc_id=_doc_id(doc),
                 filename=doc.name,
                 score=float(round(score, 3)),
-                snippet=_snippet(text, first_idx),
+                snippet=_snippet(text, anchor_idx),
             )
         )
 
