@@ -41,15 +41,18 @@ CONTROL = Path('/Volumes/carbonite/claw/data/cindylou/runtime/memory-unification
 PILOT_PARTITION = CONTROL/'native-public-pilot-20261031c'
 PILOT_REGISTRY = CONTROL/'registry.pilot.json'
 PAGE_CACHE_PATH = Path('/Volumes/carbonite/claw/data/cindylou/cache/sr3data/pdf_page_text.json')
-UNIFIED_MIN_SCORE = 0.30  # Provisional boundary threshold, evidence:
-# On the reviewed one-document partition (probe 2026-10-31), the nonsense query
-# 'Zzyzx-NoSuchCampaignEntity-94731' admitted at top score 0.230 while real hits
-# scored 0.433-0.595. Any threshold in (0.230, 0.433) separates the observed
-# junk from the observed real hits; 0.30 is the midpoint. This is a thin
-# calibration (4 probes, 1 document), flagged for operator review; it is
-# boundary ordering-contract enforcement, not answer confidence. The validated
-# pilot CONFIG is unchanged (query.minScore stays 0); the client passes this per
-# request and the adapter enforces it at our boundary via enforceMinimumScore.
+UNIFIED_MIN_SCORE = 0.30  # Provisional boundary threshold, evidence and honest limits:
+# Measured on the reviewed one-document partition (probe 2026-10-31, 12 nonsense +
+# 8 real-content probes). Junk top scores 0.230-0.378; real top scores 0.366-0.557.
+# THE DISTRIBUTIONS OVERLAP: one junk probe scored 0.378, above the lowest real hit
+# at 0.366, so no threshold separates them cleanly. At 0.30 the observed tradeoff is
+# 11/12 junk filtered and 0/8 real hits clipped - the best available point, not a
+# clean gate. Raise it and real answers start disappearing; lower it and the Zzyzx
+# nonsense case (0.230) returns. Corpus-conditional on 1 approved document; needs
+# recalibration against the full public partition before any cutover claim.
+# This is boundary ordering-contract enforcement, NOT answer confidence. The
+# validated pilot CONFIG is unchanged (query.minScore stays 0); the client passes
+# this per request and the adapter enforces it via enforceMinimumScore.
 
 if str(LEGACY_ROOT) not in sys.path:  # the bridge resolves config.pipeline_paths itself
     sys.path.insert(0, str(LEGACY_ROOT))
