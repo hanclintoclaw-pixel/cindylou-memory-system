@@ -26,9 +26,9 @@ def run_case(case: dict) -> dict:
     elif adapter == 'rules':
         cmd = [sys.executable,str(PRODUCTION/'cindylou.py'),'rules-answer','--q',query,'--limit','3']
     elif adapter == 'equipment':
-        cmd = [sys.executable,str(PRODUCTION/'scripts/equip_query.py'),query,'--json','--limit','3']
+        raise RuntimeError('equipment CLI can save production cache; use the controlled paired shadow readers')
     elif adapter == 'native-operator':
-        cmd = ['openclaw','memory','search','--agent','cindylou','--json','--max-results','3',query]
+        raise RuntimeError('live native CLI can write recall/index state; excluded from controlled verification')
     else:
         raise ValueError('unknown baseline adapter')
     start = time.monotonic()

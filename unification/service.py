@@ -12,9 +12,16 @@ class NativeReader(Protocol):
     def search(self, query: str, ctx: AccessContext, limit: int) -> dict: ...
 
 
+class SpecialistReader(Protocol):
+    """Trusted public-SR3 adapters; never an implicit fallback to campaign data."""
+    def run(self, domain: str, query: str, ctx: AccessContext, limit: int = 3) -> dict: ...
+
+
 class MemoryService:
-    def __init__(self, registry: Registry, native: NativeReader | None = None):
+    def __init__(self, registry: Registry, native: NativeReader | None = None,
+                 specialists: SpecialistReader | None = None):
         self.registry, self.native = registry, native
+        self.specialists = specialists
 
     @staticmethod
     def _envelope(results: list, backends: list, **fields):
@@ -29,8 +36,20 @@ class MemoryService:
             raise ValueError('query must contain 1..4000 characters')
         if type(limit) is not int or not 1 <= limit <= 30:
             raise ValueError('limit must be 1..30')
-        if mode not in {'lexical', 'hybrid'}:
+        if mode not in {'lexical', 'hybrid', 'specialist'}:
             raise ValueError('unsupported search mode')
+        if domain in {'rules', 'equipment'}:
+            if mode == 'hybrid':
+                raise ValueError('specialist domains do not use hybrid ranking')
+            if self.specialists is None:
+                return self._envelope([], [{'id': domain + '-specialist', 'status': 'unavailable',
+                       'reason': 'trusted specialist adapter not configured'}],
+                       status='unavailable', query=query, mode='specialist', domain=domain)
+            result = self.specialists.run(domain, query, ctx, limit)
+            ctx.check()
+            return result
+        if mode == 'specialist':
+            raise ValueError('specialist mode requires an explicit specialist domain')
         if mode == 'hybrid':
             if self.native is None:
                 return self._envelope([], [{'id': 'openclaw', 'status': 'unavailable',
@@ -84,4 +103,5 @@ class MemoryService:
     def health(self):
         return {'version': 1, 'status': 'degraded',
                 'native': 'unavailable' if self.native is None else 'configured-not-probed',
+                'specialists': 'unavailable' if self.specialists is None else 'configured-not-probed',
                 'live_cutover': False}

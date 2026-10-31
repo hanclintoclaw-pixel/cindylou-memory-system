@@ -90,7 +90,8 @@ export class NativeAdapter {
       if (req.verb === 'search') {
         const page = enforceMinimumScore(await this.provider.search({query:req.query,maxResults:req.maxResults ?? 8,
           minScore:req.minScore ?? 0,sources:['memory']}),req.minScore ?? 0);
-        if (page.status && !['ok','empty'].includes(page.status)) throw new Error('native backend not ready');
+        if ((page.status && !['ok','empty'].includes(page.status)) || page.warning ||
+            page.warnings?.length || page.disabled || page.stale) throw new Error('native backend not ready');
         let dropped = 0;
         const hits = [];
         for (const hit of page.hits) {
@@ -109,8 +110,13 @@ export class NativeAdapter {
           const from = req.from ?? 1, lines = req.lines ?? 80;
           const got = await this.provider.get({reference:{providerId:this.providerId,id:record.path},from,lines});
           const source = await fs.readFile(path.join(this.root,'workspace',record.path),'utf8');
-          const expected = source.split('\n').slice(from-1,from-1+lines).join('\n');
-          const available = source.split(/\n/).length - (source.endsWith('\n')?1:0);
+          const sourceLines = source.split('\n');
+          // A terminal newline terminates the final source line; it does not
+          // create another line. Native get serializes without that terminator.
+          // Requests extending past EOF must validate the actual source prefix.
+          if (source.endsWith('\n')) sourceLines.pop();
+          const expected = sourceLines.slice(from-1,from-1+lines).join('\n');
+          const available = sourceLines.length;
           const count = Math.max(0,Math.min(lines,available-from+1));
           if (got.status !== 'ok' || got.from !== from || !Number.isInteger(got.lines) || got.lines !== count ||
               typeof got.text !== 'string' || !got.text.startsWith(expected)) throw new Error('bounded native get failed');

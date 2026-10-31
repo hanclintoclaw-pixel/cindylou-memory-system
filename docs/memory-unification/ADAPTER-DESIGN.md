@@ -97,7 +97,8 @@ private-local facade is imported, so the version pin lives in exactly one file.
 - No operator-RPC relay, no session audience, no per-document native permissions,
   no native `extraPaths`, no chat credential, no plugin install.
 - No retuning of the SR3 rules/equipment specialists' decision logic and no
-  changing printed page numbers (their adapters are the next step after this one).
+  changing printed page numbers. `MemoryService` now routes explicit specialist
+  domains through `SpecialistReaders`; this is staged, not deployed.
 - No changing `unification/policy.py` or `partition.py` to make tests pass. If a
   boundary test fails, the adapter is wrong.
 
@@ -123,8 +124,29 @@ Private results only, under the control root
 `/Volumes/carbonite/claw/data/cindylou/runtime/memory-unification/shadow/<UTC Z>/`.
 Record per case: query, backend status, ranked references, citations with revision,
 p50/p95 from repeated runs with n, corpus/revision fingerprints, coverage, and the
-**unique facts lost** by public-only exclusion (the point of the number, not a
-formality). No credentials, no copyrighted corpus text, no GM-private evidence in
+reviewed semantic-claim outcomes. Global **unique facts lost** stays unassessed
+without complete, conclusive equivalence review; line/probe inventories cannot
+supply it. No credentials, no copyrighted corpus text, no GM-private evidence in
 git. Small-corpus timings are experimental and must be labelled as such — they are
 not full-wiki p95 claims. The U2 targets (<=2s campaign/equipment warm, <=4.5s
 rules) are engineering targets; report measured values and say if unmet.
+
+## Repaired evidence contract
+
+See `SOL-REPAIR-2026-10-31.md`. Registry/partition paths are explicit and shared
+across adapters, validation, fingerprints and optional schema-v2 claim inventory.
+No legacy live native CLI runs. Legacy campaign is an operator-only full-corpus
+baseline, not equivalent public authority. Native candidate scores are not answer
+confidence; plausible unsupported questions may still return public candidates.
+
+Deep-fact checks require revision-bound bounded passage evidence. Positive SR3
+cases exercise the actual shared specialist route, preserving printed citations
+and separate PDF/marker locations. Fresh source/backend/evaluator hashes are
+validated on both sides of the experiment; drift rejects the report. Specialist
+citations bypass campaign redaction only when bound to the measured specialist
+source generation. Failed warm attempts prevent a latency-target pass.
+
+`scripts/memory_unification_verify.py --registry PATH --partition PATH` creates
+new private receipts for paired cases, three reviewed claims, boundary checks,
+retained score probes, and selected before/after observations. It does not deploy,
+grant session authority, prove full-corpus equivalence or grade model answers.

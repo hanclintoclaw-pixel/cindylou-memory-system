@@ -1,14 +1,75 @@
 {
-  "version": 1,
-  "note": "Fixed baseline probes. Evidence checks are not model-answer correctness grades. Synthetic security/consistency cases live in tests/unification. Native probe is explicitly LOCAL OPERATOR, never public/session impersonation.",
+  "version": 2,
+  "note": "Fixed retrieval/admission probes, not model-answer grades. Full legacy campaign is operator-only baseline vs asymmetric public partition. Native-operator case is deliberately unavailable: no live CLI write surfaces exercised.",
   "cases": [
-    {"id":"campaign-entity","adapter":"campaign","query":"Tom Erlichman","expected_doc":"wiki/NPCs/Tom-Erlichman.md"},
-    {"id":"campaign-deep-fact","adapter":"campaign","query":"Curtis Karma Pool","expected_doc":"wiki/PCs/Curtis.md","required_source_terms":["Karma Pool: 9","Karma): 25"]},
-    {"id":"campaign-absent","adapter":"campaign","query":"Zzyzx-NoSuchCampaignEntity-94731","expected_empty":true},
-    {"id":"equipment-exact","adapter":"equipment","query":"Ares Predator","expected_name":"Ares Predator (HPist)","expected_citation":"sr3.278","expected_damage":"9M"},
-    {"id":"rules-printed-page","adapter":"rules","query":"how many dice for a drain resistance test","observe_only":true},
-    {"id":"rules-absent","adapter":"rules","query":"Zzyzx-NoSuchSR3Term-94731","expected_decline":true},
-    {"id":"native-operator-recall","adapter":"native-operator","query":"Cindy memory retrieval keyword semantic","observe_only":true}
+    {
+      "id": "campaign-entity",
+      "adapter": "campaign",
+      "query": "Tom Erlichman",
+      "expected_doc": "wiki/NPCs/Tom-Erlichman.md"
+    },
+    {
+      "id": "campaign-approved-fact",
+      "adapter": "campaign",
+      "query": "Tom Erlichman credstick",
+      "expected_doc": "wiki/NPCs/Tom-Erlichman.md",
+      "required_source_terms": [
+        "Carried 250¥",
+        "certified credstick"
+      ]
+    },
+    {
+      "id": "campaign-deep-fact",
+      "adapter": "campaign",
+      "query": "Curtis Karma Pool",
+      "expected_doc": "wiki/PCs/Curtis.md",
+      "required_source_terms": [
+        "Karma Pool: 9",
+        "Karma): 25"
+      ]
+    },
+    {
+      "id": "campaign-absent",
+      "adapter": "campaign",
+      "query": "Zzyzx-NoSuchCampaignEntity-94731",
+      "expected_empty": true
+    },
+    {
+      "id": "equipment-exact",
+      "adapter": "equipment",
+      "query": "Ares Predator",
+      "expected_name": "Ares Predator (HPist)",
+      "expected_citation": "sr3.278",
+      "expected_damage": "9M"
+    },
+    {
+      "id": "rules-printed-page",
+      "adapter": "rules",
+      "query": "how many dice for a drain resistance test",
+      "observe_only": true
+    },
+    {
+      "id": "rules-positive-citation",
+      "adapter": "rules",
+      "query": "what attribute is stealth linked to",
+      "expected_rule_citation": "SR3_Core_Rulebook_FanPro p.87",
+      "required_rule_terms": [
+        "Stealth (Quickness)",
+        "The Stealth Skill governs sneaking around"
+      ]
+    },
+    {
+      "id": "rules-absent",
+      "adapter": "rules",
+      "query": "Zzyzx-NoSuchSR3Term-94731",
+      "expected_decline": true
+    },
+    {
+      "id": "native-operator-recall",
+      "adapter": "native-operator",
+      "query": "Cindy memory retrieval keyword semantic",
+      "observe_only": true
+    }
   ],
   "followup_cases": [
     "Legacy fact save/search coverage: inventory 17 rows without promoting them (U3)",

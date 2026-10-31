@@ -9,10 +9,8 @@ and fingerprint() -> {'corpus_sha256': ..., 'revisions_sha256': ...,
 Readers must preserve the query/context, apply their own policy, and never manage
 services. Missing fingerprints/reviews are reported unavailable, never fabricated.
 
-Optional reviewed fact inventory is {'reviewed': True, 'records': [
- {'fact_sha256': SHA256, 'evidence_group_sha256': SHA256, 'public': bool,
-  'legacy_retrievable': bool, 'unified_retrievable': bool}]}. No fact text is
-accepted or saved. Hashes identify reviewed facts, not whole-document substitutes.
+Optional schema-v2 claim inventory binds source revisions, semantic review and
+query/bounded-read receipts. Old line/probe inventories cannot measure unique loss.
 Final-answer grades require a separate answer_review with status, reviewer, and
 rubric_revision (SHA256). Retrieval alone NEVER supplies an answer grade.
 """
@@ -59,38 +57,33 @@ def percentile_summary(values):
 def unique_facts_lost(inventory):
     if inventory is None:
         return {'status':'unavailable','count':None,'reason':'reviewed fact-level exclusion inventory not supplied'}
-    if not isinstance(inventory,dict) or set(inventory) != {'reviewed','records'} or inventory['reviewed'] is not True:
-        raise ValueError('reviewed fact-level inventory required')
-    groups = {}
-    for row in inventory['records']:
-        if set(row) != {'fact_sha256','evidence_group_sha256','public','legacy_retrievable','unified_retrievable'} or any(
-            not isinstance(row[k],str) or not SHA256.fullmatch(row[k]) for k in ('fact_sha256','evidence_group_sha256')) or any(
-            type(row[k]) is not bool for k in ('public','legacy_retrievable','unified_retrievable')):
-            raise ValueError('opaque fact/group hashes and explicit eligibility required; no evidence text')
-        groups.setdefault(row['fact_sha256'],[]).append(row)
-    lost = []
-    for fact, rows in sorted(groups.items()):
-        if any(r['unified_retrievable'] for r in rows):
-            continue
-        # A missing public fact is a retrieval regression, not public-only exclusion.
-        if any(r['public'] for r in rows):
-            continue
-        if any(r['legacy_retrievable'] for r in rows):
-            lost.append({'fact_sha256':fact,'evidence_groups':len({r['evidence_group_sha256'] for r in rows}),
-                         'reason':'public-only exclusion'})
-    return {'status':'measured','count':len(lost),'unique_facts':lost,
-            'reviewed_unique_facts':len(groups),'note':'Fact identifiers only; no nonpublic evidence text.'}
+    from scripts.memory_unification_fact_review import summarize_claims
+    if not isinstance(inventory, dict) or inventory.get('version') != 2:
+        raise ValueError('revision-bound schema-v2 claim inventory required')
+    return summarize_claims(inventory)
 
 
 def retrieval_check(case, response):
     hits = response.get('results',[])
     if not isinstance(hits,list):
         return {'status':'not_assessed','reason':'invalid results envelope'}
-    if response.get('status') not in {'ok','empty'}:
+    if response.get('status') not in {'ok','empty','decline'}:
         return {'status':'not_assessed','reason':'backend not available'}
     checks = {}
     if case.get('expected_doc'):
         checks['expected_doc_in_top5'] = any(h.get('doc_id','').split('#')[0] == case['expected_doc'] for h in hits[:5])
+    if case.get('required_source_terms'):
+        checks['bounded_fact_support'] = any(
+            p.get('status') == 'ok' and p.get('doc_id','').split('#')[0] == case['expected_doc']
+            and isinstance(p.get('revision'), str) and SHA256.fullmatch(p['revision'])
+            and p.get('revision') == h.get('revision') and p.get('doc_id') == h.get('doc_id')
+            and isinstance(p.get('source_line'), int) and p['source_line'] >= 1
+            and type(p.get('lines_returned')) is int and 1 <= p['lines_returned'] <= 200
+            and isinstance(p.get('passage_sha256'), str) and SHA256.fullmatch(p['passage_sha256'])
+            and p.get('required_terms_sha256') == digest(case['required_source_terms'])
+            and p.get('required_terms_present') == [True]*len(case['required_source_terms'])
+            and p.get('supports_required_fact') is True
+            for p in response.get('passage_evidence', []) for h in hits[:5])
     if case.get('expected_empty'):
         checks['empty'] = not hits
     if case.get('expected_decline'):
@@ -100,8 +93,16 @@ def retrieval_check(case, response):
         admitted = [h for h in hits if h.get('name','').casefold() == case['expected_name'].casefold()
                     and h.get('tier') in {'SR3','VERIFIED'}]
         checks['named_citable_candidate'] = bool(admitted)
-        checks['citation_preserved'] = any(h.get('cite','').split(' -> ',1)[0] == case['expected_citation'] for h in admitted)
-        checks['damage_exact'] = any(h.get('fields',{}).get('Damage') == case['expected_damage'] for h in admitted)
+        checks['exact_evidence_same_candidate'] = any(h.get('cite','').split(' -> ',1)[0] == case['expected_citation']
+            and h.get('fields',{}).get('Damage') == case['expected_damage']
+            and isinstance(h.get('revision'),str) and SHA256.fullmatch(h['revision']) for h in admitted)
+    if case.get('expected_rule_citation'):
+        checks['specialist_accepted'] = response.get('accepted') is True
+        checks['rule_passage_and_printed_citation'] = any(
+            h.get('citation') == case['expected_rule_citation']
+            and type(h.get('printed_page')) is int and h['printed_page'] > 0
+            and isinstance(h.get('revision'),str) and SHA256.fullmatch(h['revision'])
+            and all(t in h.get('excerpt','') for t in case['required_rule_terms']) for h in hits)
     return {'status':('correct' if all(checks.values()) else 'incorrect') if checks else 'not_assessed',
             'checks':checks,'note':'Retrieval/admission only; source-term presence is not an answer grade.'}
 
@@ -114,12 +115,49 @@ def answer_check(response):
     return {k:review[k] for k in ('status','reviewer','rubric_revision')}
 
 
-def ranked_evidence(response, approved):
+def specialist_evidence_bound(hit, response, adapter, fingerprint):
+    """Domain labels are not grants; bind to the trusted pre-run source snapshot."""
+    if adapter not in {'rules','equipment'} or hit.get('domain') != adapter:
+        return False
+    trusted = (fingerprint or {}).get('specialists', {}).get(adapter)
+    if not isinstance(trusted,dict) or hit.get('backend_version') != trusted.get('backend_version'):
+        return False
+    if not any(b.get('id') == adapter+'-specialist-wrapped' and b.get('status') == 'ready'
+               and all(b.get(k) == trusted.get(k) for k in ('generation_sha256','backend_version','source_revisions'))
+               for b in response.get('backends',[])):
+        return False
+    doc_id, revision = hit.get('doc_id',''), hit.get('revision')
+    if not isinstance(revision,str) or not SHA256.fullmatch(revision):
+        return False
+    sources = trusted.get('source_revisions',{})
+    if adapter == 'equipment':
+        return (doc_id.startswith('sr3data:') and hit.get('tier') in {'VERIFIED','SR3','WEAK'} and
+                any(Path(path).name == 'sr3data.sqlite' and rev == revision for path,rev in sources.items()))
+    return (doc_id.startswith('00_sources/rules_references/') and '..' not in Path(doc_id).parts and
+            any(path.endswith('/'+doc_id) and rev == revision for path,rev in sources.items()))
+
+
+def ranked_evidence(response, approved, *, adapter=None, fingerprint=None):
     """No snippets or private evidence in the collector, even from legacy adapters."""
     references = []
     for rank, hit in enumerate(response.get('results',[]),1):
         doc_id, revision = hit.get('doc_id'), hit.get('revision')
+        # SR3 specialist citations have their own reviewed source/code revision;
+        # they are not campaign registry grants. Never persist their excerpts.
+        if specialist_evidence_bound(hit, response, adapter, fingerprint):
+            references.append({'rank':rank, **{k:hit[k] for k in (
+                'doc_id','revision','domain','citation','printed_page','marker_page',
+                'cite','tier','name','source_revisions','backend_version') if k in hit}})
+            continue
         evidence = approved.get((doc_id,revision))
+        # Whole mixed legacy pages must not inherit a neighboring approved section.
+        if evidence is None and '#' not in (doc_id or ''):
+            matches = [v for (key,rev),v in approved.items() if key.split('#')[0] == doc_id and rev == revision]
+            if matches:
+                references.append({'rank':rank,'doc_id':doc_id,'revision':revision,
+                    'scope':'approved-sections-only; other page content not authorized',
+                    'approved_sections':[{k:v[k] for k in ('doc_id','source_start_line','source_end_line','claim_status','authority')} for v in matches]})
+                continue
         if evidence is None:
             references.append({'rank':rank,'reference_sha256':digest([doc_id,revision]),
                                'redacted':True,'reason':'outside reviewed public generation'})
@@ -141,7 +179,7 @@ def backend_fingerprint(reader):
             for k in ('corpus_sha256','revisions_sha256')) or result.get('measurement_scope') not in {
                 'synthetic-fixture','small-reviewed-partition','full-corpus'}:
         return {'status':'unavailable','reason':'invalid adapter fingerprint'}
-    return {'status':'available',**{k:result[k] for k in ('corpus_sha256','revisions_sha256','measurement_scope')}}
+    return {'status':'available',**result}
 
 
 def evaluate(legacy, unified, *, registry_path, partition, repeats=3, fact_inventory=None, clock=time.monotonic):
@@ -153,15 +191,22 @@ def evaluate(legacy, unified, *, registry_path, partition, repeats=3, fact_inven
     registry = validate_generation(Path(registry_path),Path(partition),manifest)
     approved = {(r['evidence']['doc_id'],r['evidence']['revision']):r['evidence'] for r in manifest['records']}
     cases = pinned_cases()
+    evaluator_paths = [Path(__file__), CASES_PATH, ROOT/'scripts/memory_unification_shadow_readers.py',
+                       ROOT/'scripts/memory_unification_fact_review.py', ROOT/'scripts/memory_unification_eval.py']
+    def evaluator_generation():
+        return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in evaluator_paths}
+    evaluator_before = evaluator_generation()
     fingerprint = {'registry_sha256':hashlib.sha256(Path(registry_path).read_bytes()).hexdigest(),
         'public_manifest_sha256':digest(manifest),'case_set_sha256':hashlib.sha256(CASES_PATH.read_bytes()).hexdigest(),
         'corpus_sha256':digest(sorted(e[0] for e in approved)),
         'revisions_sha256':digest(sorted([list(e) for e in approved])),'coverage':registry.coverage}
     readers = {'legacy':legacy,'unified':unified}
     fingerprints = {name:backend_fingerprint(reader) for name,reader in readers.items()}
-    report = {'version':1,'live_cutover':False,'fingerprints':fingerprint,'backend_fingerprints':fingerprints,
-        'context':{'audience':'public','authority':'trusted local evaluation; not a session lease'},
-        'timing_note':'Experimental paired retrieval timings, separate from model/audio. Small-corpus or synthetic runs are NOT full-wiki p95. With n=3 p95 is the sample maximum.',
+    report = {'version':2,'live_cutover':False,'fingerprints':fingerprint,'backend_fingerprints':fingerprints,
+        'evaluator_generation':evaluator_before,'python_version':sys.version,
+        'context':{'audience':'public','authority':'trusted local evaluation; not a session lease',
+                   'legacy_campaign':'operator-baseline-only; NOT equivalent public-authority corpus'},
+        'timing_note':'Experimental retrieval+required-read timings, no model/audio. Warm n=repeats-1 (two at repeats=3); p95 is that small sample maximum, NOT a full-wiki service estimate.',
         'unique_facts_lost':unique_facts_lost(fact_inventory),'cases':[]}
     context = AccessContext()
     for case in cases:
@@ -173,14 +218,16 @@ def evaluate(legacy, unified, *, registry_path, partition, repeats=3, fact_inven
                 before = clock()
                 try:
                     response = reader.run(dict(case),context)
-                    if not isinstance(response,dict) or response.get('status') not in {'ok','empty','stale','unavailable','denied'} or not isinstance(response.get('results'),list):
+                    if not isinstance(response,dict) or response.get('status') not in {'ok','empty','decline','stale','unavailable','denied'} or not isinstance(response.get('results'),list):
                         raise ValueError('normalized backend envelope required')
                     backends = response.get('backends')
                     if not isinstance(backends,list) or not backends or any(not isinstance(b,dict) for b in backends):
                         raise ValueError('explicit backend status required')
-                    if response['status'] in {'ok','empty'} and any(b.get('status') != 'ready' for b in backends):
+                    if response['status'] in {'ok','empty','decline'} and any(b.get('status') != 'ready' for b in backends):
                         raise ValueError('unavailable is not a healthy empty search')
-                    if response['status'] not in {'ok','empty'} or any(b.get('status') != 'ready' for b in backends):
+                    if response.get('warning') or response.get('warnings') or response.get('disabled') or response.get('stale'):
+                        response = {**response,'status':'unavailable','results':[], 'coverage':'partial'}
+                    if response['status'] not in {'ok','empty','decline'} or any(b.get('status') != 'ready' for b in backends):
                         response = {**response,'coverage':'partial'}
                 except Exception as error:
                     response = {'status':'unavailable','results':[],'coverage':'partial',
@@ -189,14 +236,17 @@ def evaluate(legacy, unified, *, registry_path, partition, repeats=3, fact_inven
                 runs[name].append({'run':repeat,'elapsed_s':elapsed,'status':response['status'],
                     'backend_status':[{'id':b.get('id'),'status':b.get('status')} for b in response.get('backends',[])],
                     'coverage':response.get('coverage','partial'),
-                    'ranked_references':ranked_evidence(response,approved),
+                    'warning':response.get('warning'),
+                    'passage_evidence': [{k:v for k,v in p.items() if k != 'text'} for p in response.get('passage_evidence',[])],
+                    'ranked_references':ranked_evidence(response,approved,adapter=case['adapter'],fingerprint=fingerprints[name]),
                     'retrieval_correctness':retrieval_check(case,response),'answer_correctness':answer_check(response)})
         for name,observations in runs.items():
-            healthy = [r['elapsed_s'] for r in observations if r['status'] in {'ok','empty'}]
-            warm = [r['elapsed_s'] for r in observations[1:] if r['status'] in {'ok','empty'}]
+            healthy = [r['elapsed_s'] for r in observations if r['status'] in {'ok','empty','decline'}]
+            warm = [r['elapsed_s'] for r in observations[1:] if r['status'] in {'ok','empty','decline'}]
             warm_stats = percentile_summary(warm)
             target = 4.5 if case['adapter']=='rules' else 2.0 if case['adapter'] in {'campaign','equipment'} else None
-            measurable = (bool(warm) and target is not None and fingerprints[name].get('status')=='available'
+            measurable = (len(healthy)==repeats and len(warm)==repeats-1 and bool(warm)
+                          and target is not None and fingerprints[name].get('status')=='available'
                           and fingerprints[name].get('measurement_scope') != 'synthetic-fixture')
             row['backends'][name] = {'runs':observations,'latency':percentile_summary(healthy),'warm_latency':warm_stats,
                 'attempted_n':len(observations),'cold_first_s':observations[0]['elapsed_s'],
@@ -205,6 +255,13 @@ def evaluate(legacy, unified, *, registry_path, partition, repeats=3, fact_inven
         report['cases'].append(row)
     # Corpus edits during an evaluation invalidate its evidence, too.
     validate_generation(Path(registry_path),Path(partition),manifest)
+    after = {name:backend_fingerprint(reader) for name,reader in readers.items()}
+    if evaluator_generation() != evaluator_before or any(
+            fingerprints[name].get('status') != 'available' or after[name] != fingerprints[name] for name in readers):
+        from unification.policy import StaleReference
+        raise StaleReference('measured backend generation unavailable or changed; reject paired evidence')
+    report['backend_fingerprints_after'] = after
+    report['generation_validation'] = 'unchanged-content-hashes'
     return report
 
 
@@ -229,6 +286,7 @@ def main():
     parser.add_argument('--registry',type=Path,required=True)
     parser.add_argument('--partition',type=Path,required=True)
     parser.add_argument('--repeats',type=int,default=3)
+    parser.add_argument('--fact-inventory',type=Path,help='optional revision-bound schema-v2 reviewed claim inventory')
     args = parser.parse_args()
     os.umask(0o077)
     spec = importlib.util.spec_from_file_location('shadow_injected_adapter',args.adapter_file)

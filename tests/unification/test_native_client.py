@@ -415,6 +415,34 @@ console.log(JSON.stringify({first,second,revoked,leases,imports,closes,managers,
         self.assertEqual(result['second']['status'],'empty')
         self.assertEqual(result['revoked']['status'],'unavailable')
 
+    def test_node_bounded_get_past_eof_ignores_only_terminal_newline(self):
+        result = self.node("""
+const a=make();
+got={status:'ok',from:1,lines:2,text:'Public cobalt wren.\\nSecond public line.'};
+const full=await a.dispatch({id:1,verb:'get',doc_id:manifest.records[0].evidence.doc_id,from:1,lines:200});
+got={...got,text:'Public cobalt wren.\\nWRONG second public line.'};
+const bad=await a.dispatch({id:2,verb:'get',doc_id:manifest.records[0].evidence.doc_id,from:1,lines:200});
+await a.close();
+console.log(JSON.stringify({full,bad}));
+""")
+        self.assertEqual(result['full']['status'],'ok')
+        self.assertEqual(result['full']['lines_returned'],2)
+        self.assertEqual(result['full']['text'],'Public cobalt wren.\nSecond public line.')
+        self.assertEqual(result['bad']['status'],'unavailable')
+
+    def test_node_native_warning_is_not_healthy_empty(self):
+        result = self.node("""
+const a=make();
+page={hits:[],warnings:['source index stale']};
+const warned=await a.dispatch({id:1,verb:'search',query:'wren'});
+page={hits:[],disabled:true};
+const disabled=await a.dispatch({id:2,verb:'search',query:'wren'});
+await a.close();
+console.log(JSON.stringify({warned,disabled}));
+""")
+        self.assertEqual(result['warned']['status'],'unavailable')
+        self.assertEqual(result['disabled']['status'],'unavailable')
+
     def test_shadow_pairs_queries_and_records_revision_latency_and_separate_grades(self):
         from scripts.memory_unification_shadow import evaluate, pinned_cases, digest
         owner = self
@@ -466,21 +494,12 @@ console.log(JSON.stringify({first,second,revoked,leases,imports,closes,managers,
         self.assertNotIn('never saved',json.dumps(rows))
 
     def test_shadow_unique_fact_deduplication_and_no_evidence_text(self):
-        from scripts.memory_unification_shadow import unique_facts_lost, digest
-        def row(fact,group,public=False,legacy=True,unified=False):
-            return {'fact_sha256':digest(fact),'evidence_group_sha256':digest(group),
-                    'public':public,'legacy_retrievable':legacy,'unified_retrievable':unified}
-        inventory={'reviewed':True,'records':[row('lost','group'),row('lost','group'),row('lost','another'),
-            row('kept','group'),row('kept','group',public=True,unified=True),
-            row('public miss','group',public=True),row('absent','group',legacy=False)]}
-        report=unique_facts_lost(inventory)
-        self.assertEqual(report['count'],1)
-        self.assertEqual(report['reviewed_unique_facts'],4)
-        self.assertEqual(report['unique_facts'][0]['fact_sha256'],digest('lost'))
-        self.assertEqual(report['unique_facts'][0]['evidence_groups'],2)
-        with self.assertRaises(ValueError):unique_facts_lost({'reviewed':False,'records':[]})
-        inventory['records'][0]['text']='must not be accepted'
+        # The original bool/line fixture falsely asserted semantic review. Its
+        # v2 replacement (including derivative dedup) lives in test_fact_review.
+        from scripts.memory_unification_shadow import unique_facts_lost
+        inventory={'reviewed':True,'records':[]}
         with self.assertRaises(ValueError):unique_facts_lost(inventory)
+        with self.assertRaises(ValueError):unique_facts_lost({'reviewed':False,'records':[]})
 
     def test_shadow_unavailable_not_empty_targets_and_private_output(self):
         from scripts.memory_unification_shadow import evaluate, digest, write_report, OUTPUT_ROOT
