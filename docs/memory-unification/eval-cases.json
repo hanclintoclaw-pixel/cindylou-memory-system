@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "note": "Fixed baseline probes. Evidence checks are not model-answer correctness grades. Synthetic security/consistency cases live in tests/unification. Native probe is explicitly LOCAL OPERATOR, never public/session impersonation.",
+  "cases": [
+    {"id":"campaign-entity","adapter":"campaign","query":"Tom Erlichman","expected_doc":"wiki/NPCs/Tom-Erlichman.md"},
+    {"id":"campaign-deep-fact","adapter":"campaign","query":"Curtis Karma Pool","expected_doc":"wiki/PCs/Curtis.md","required_source_terms":["Karma Pool: 9","Karma): 25"]},
+    {"id":"campaign-absent","adapter":"campaign","query":"Zzyzx-NoSuchCampaignEntity-94731","expected_empty":true},
+    {"id":"equipment-exact","adapter":"equipment","query":"Ares Predator","expected_name":"Ares Predator (HPist)","expected_citation":"sr3.278","expected_damage":"9M"},
+    {"id":"rules-printed-page","adapter":"rules","query":"how many dice for a drain resistance test","observe_only":true},
+    {"id":"rules-absent","adapter":"rules","query":"Zzyzx-NoSuchSR3Term-94731","expected_decline":true},
+    {"id":"native-operator-recall","adapter":"native-operator","query":"Cindy memory retrieval keyword semantic","observe_only":true}
+  ],
+  "followup_cases": [
+    "Legacy fact save/search coverage: inventory 17 rows without promoting them (U3)",
+    "Correction supersedes but retains original (U3)",
+    "Derivative copies share one evidence group (U3)",
+    "Cross-caller evidence parity at identical source revisions (U2/U4)",
+    "Live answer correctness, not only source presence (U4)"
+  ]
+}

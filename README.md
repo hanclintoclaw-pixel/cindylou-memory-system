@@ -2,6 +2,14 @@
 
 Staged data pipeline for ingestion, OCR cleanup, memory organization, caching, and serving.
 
+## Memory unification (in development)
+
+See [the executable staged plan](docs/memory-unification/PLAN.md),
+[restart instructions](docs/memory-unification/RESUME.md), and
+[initial checkpoint](docs/memory-unification/CHECKPOINT-2026-10-31.md).
+The `unification/` module is an isolated, non-production prototype. Existing CLI/API
+routes are not switched; native hybrid and session integration are not yet implemented.
+
 ## Repository Layout
 - `01_ingestion/` raw ingestion and OCR runners
 - `02_cleanup/` OCR harmonization and cleanup
