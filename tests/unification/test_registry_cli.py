@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -18,10 +19,14 @@ class RegistryCliTests(unittest.TestCase):
         (self.root/'public.md').write_text('Public emerald hamster.')
         (self.root/'private.md').write_text('Private sapphire ferret.')
         self.manifest=self.root/'registry.json'
-        self.payload={'version':1,'sources':[
-            {'namespace':'shared','root':str(self.root),'visibility':'public','approved':['public.md']},
-            {'namespace':'ops','root':str(self.root),'visibility':'operator','approved':['private.md']}]}
+        self.payload={'version':2,'sources':[
+            {'namespace':'shared','root':str(self.root),'approvals':[self.approval('public.md','public')]},
+            {'namespace':'ops','root':str(self.root),'approvals':[self.approval('private.md','operator')]}]}
         self.save()
+
+    def approval(self, filename, visibility):
+        return {'path':filename,'revision':hashlib.sha256((self.root/filename).read_bytes()).hexdigest(),
+                'sections':[{'section_id':'whole','start_line':1,'end_line':1,'visibility':visibility}]}
 
     def save(self):
         self.manifest.write_text(json.dumps(self.payload))
@@ -48,7 +53,7 @@ class RegistryCliTests(unittest.TestCase):
         self.assertNotEqual(run.returncode,0)
 
     def test_manifest_schema_and_explicit_approval_required(self):
-        for broken in [{'version':2,'sources':[]},
+        for broken in [{'version':1,'sources':[]},
                        {'version':1,'sources':[{'namespace':'x','root':str(self.root)}]},
                        {'version':1,'sources':[{'namespace':'x','root':'.','approved':[]}]}]:
             self.manifest.write_text(json.dumps(broken))

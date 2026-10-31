@@ -1,23 +1,35 @@
-"""Load a trusted local source manifest; never accept manifests from a remote request."""
+"""Trusted local revision-bound manifest; never deserialize a remote manifest."""
 from pathlib import Path
 import json
 
-from .policy import Registry, Source
+from .policy import Approval, Registry, Section, Source
+
+
+def _fields(value, allowed):
+    if not isinstance(value, dict) or set(value) - allowed:
+        raise ValueError('unknown registry field')
 
 
 def load_registry(path: Path) -> Registry:
     payload = json.loads(path.read_text())
-    if payload.get('version') != 1 or not isinstance(payload.get('sources'),list):
-        raise ValueError('unsupported registry schema')
+    _fields(payload, {'version', 'sources', 'coverage'})
+    if payload.get('version') != 2 or not isinstance(payload.get('sources'), list):
+        raise ValueError('unsupported registry schema; revision-bound v2 required')
     sources = []
     for entry in payload['sources']:
-        if set(entry) - {'namespace','root','visibility','domain','status','approved',
-                         'conversation_id','authority','evidence_group'}:
-            raise ValueError('unknown registry field')
-        if not isinstance(entry.get('approved'),list) or not all(isinstance(x,str) for x in entry['approved']):
-            raise ValueError('explicit approved list required')
-        root = Path(entry['root'])
-        if not root.is_absolute():
-            raise ValueError('registry root must be absolute')
-        sources.append(Source(**{**entry,'root':root,'approved':frozenset(entry['approved'])}))
-    return Registry(sources,coverage=payload.get('coverage','partial'))
+        _fields(entry, {'namespace', 'root', 'domain', 'approvals', 'evidence_group'})
+        if not isinstance(entry.get('approvals'), list):
+            raise ValueError('explicit approvals required')
+        approvals = []
+        for item in entry['approvals']:
+            _fields(item, {'path', 'revision', 'sections'})
+            if not isinstance(item.get('sections'), list):
+                raise ValueError('explicit sections required')
+            sections = []
+            for section in item['sections']:
+                _fields(section, {'section_id', 'start_line', 'end_line', 'visibility',
+                                  'status', 'authority', 'evidence_group', 'conversation_id'})
+                sections.append(Section(**section))
+            approvals.append(Approval(item['path'], item['revision'], tuple(sections)))
+        sources.append(Source(**{**entry, 'root': Path(entry['root']), 'approvals': tuple(approvals)}))
+    return Registry(sources, coverage=payload.get('coverage', 'partial'))

@@ -15,3 +15,16 @@
    Respect each deployment/privacy gate and accurately preserve incomplete steps.
 
 The plan is internal. Private baselines/results must not be copied to the campaign wiki.
+
+## After the section-approval checkpoint
+
+The trusted pilot registry now requires schema v2 (exact hash + explicit section ranges);
+legacy v1 blanket approvals are rejected. Read `SOURCE-APPROVALS.md` and the latest native
+spike section in `NATIVE-INTEGRATION.md`. Verification commands:
+
+- `python3 -m unittest discover -s tests/unification -v`
+- `node --test tests/unification/native_contract.test.mjs`
+
+The public partition is a disposable index view, never a new canonical source. Its
+loopback embedding transport does not manage/restart the existing service. Preserve
+failed experiment reports. U2 overall remains in progress after the successful spike.

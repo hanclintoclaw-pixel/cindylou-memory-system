@@ -60,3 +60,65 @@ not an excuse to delete the draft or rewrite campaign canon during infrastructur
 - Public wiki classification, public-native partition or semantic parity.
 - Unified equipment/rules routing or cross-caller agreement.
 - Durable-fact import/capture receipts and live voice behavior.
+
+## 2026-10-31: isolated public-partition spike proven (not U2 cutover)
+
+U1 now uses registry schema v2; see `SOURCE-APPROVALS.md`. A single reviewed public
+section from the mixed pilot page is projected into a new disposable index input. Its
+page-level provisional status remains unchanged; GM background/build never enter the
+partition. Authoritative wiki files were not edited. Full source/view eligibility is
+validated before and after the subprocess, with the registry reloaded after I/O.
+
+The installed `getActiveMemoryProvider` successfully opens a caller-bound **operator**
+lease in an isolated state/config/workspace. Installed memory-core reports adapter
+`legacy`: the neutral facade adapts its existing native builtin hybrid engine, rather
+than exposing a new `providerRuntime`. Do not call this a public supported API or a
+host-minted session lease. The facade advertises support for memory and sessions, even
+when its configured/indexed source set is memory-only. Capability is not corpus membership.
+
+### Embedding dependency and isolation
+
+Minimal memory-core-only configuration cannot resolve `provider: local`; that adapter is
+registered by the llama-cpp plugin. Loading its managed configuration can prepare/reconcile
+services, which is unnecessary for a read-only retrieval experiment. Instead the isolated
+partition uses documented `provider: openai-compatible` pointed at the already-running
+loopback embedding endpoint, with the same EmbeddingGemma model, `fallback: none`, no
+managed models configuration, no extraPaths and session/cross-conversation recall disabled.
+No chat credential, production configuration copy, new plugin installation, daemon restart
+or live memory-index rebuild is needed. The separately built index has its own provider
+identity; it must not be overlaid on the live index.
+
+### Checks and observed contract mismatch
+
+- Native health proves builtin hybrid, FTS ready, complete vector index (768 dimensions),
+  one input file / two chunks, and indexed sources exactly `memory`.
+- Three queries repeated three times exercise entity, paraphrase and excluded-background
+  wording. All native references stay within the one approved projection; native bounded
+  get succeeds. A negative/background query may still return related public text; this is
+  NOT evidence that the asked-about draft fact is public, confirmed or answered.
+- Session search returns no hits; traversal, outside-workspace and missing direct reads
+  are denied/not_found. Revoking the lease rejects later calls; teardown closes the lease.
+- Native bounded get appends a continuation notice outside the structured source-line
+  count. Validate `from`/`lines` and the exact source prefix, not total response newlines.
+- **Raw native hybrid search does not strictly honor minScore.** The implementation in
+  `extensions/memory-core/src/memory/hybrid.ts:270` intentionally admits lexical fallback
+  below the requested threshold. Its legacy neutral facade passes those results through.
+  `unification/native_contract.mjs` supplies a strict final score filter at our boundary;
+  finite scores meeting the requested threshold only. The raw mismatch stays in the
+  evidence report. This is ordering-contract enforcement, NOT an answer-confidence gate.
+  Do not change production engine ranking to fix the isolated consumer.
+
+Private dated partition directories and reports are referenced by STATE. Earlier failed
+experiments remain preserved; subsequent attempts archive reports rather than overwrite
+the only failure record. Small-corpus timings are experimental, not full-wiki p95 claims.
+
+### Remaining U2 work / exact handoff
+
+Build a persistent adapter using this pinned private-local facade and public partition.
+It must validate source/approval generation before and after every operation, normalize
+minScore, map projection references/citations back to authoritative section/revision,
+fail explicitly on stale/unavailable runtime, respect host revocation and budgets, and
+return honest partial coverage. Do not infer automaticRecall eligibility or session rights.
+Then add exact SR3 specialist adapters and fixed-question shadow/nonregression evaluations.
+The Python MemoryService hybrid path remains **unavailable** until that integration exists;
+this successful standalone spike is not a claim that chat/CLI/voice share native recall yet.

@@ -1,8 +1,9 @@
 from pathlib import Path
 import tempfile
+import hashlib
 import unittest
 
-from unification.policy import AccessContext, AccessDenied, Registry, Source, StaleReference
+from unification.policy import AccessContext, AccessDenied, Approval, Registry, Section, Source, StaleReference
 from unification.service import MemoryService
 
 
@@ -20,12 +21,17 @@ class PolicyTests(unittest.TestCase):
             folder = self.root / visibility
             folder.mkdir()
             (folder/'note.md').write_text(text)
-            sources.append(Source(visibility, folder, visibility=visibility,
-                                  approved=frozenset({'note.md'}),
-                                  conversation_id='A' if visibility == 'conversation' else None))
+            sources.append(Source(visibility, folder, approvals=(self.approval(folder/'note.md', visibility),)))
         self.registry = Registry(sources)
         self.service = MemoryService(self.registry)
         self.public = AccessContext()
+
+    @staticmethod
+    def approval(path, visibility='public'):
+        raw = path.read_bytes()
+        return Approval(path.name, hashlib.sha256(raw).hexdigest(),
+                        (Section('whole', 1, len(raw.decode().splitlines()), visibility=visibility,
+                                 conversation_id='A' if visibility == 'conversation' else None),))
 
     def test_public_search_never_includes_private_snippets(self):
         for secret in ['violet-otter', 'silver-puma', 'copper-badger']:
@@ -71,7 +77,7 @@ class PolicyTests(unittest.TestCase):
             self.service.search('Nashville', AccessContext('anything'))
 
     def test_empty_approval_admits_nothing(self):
-        service = MemoryService(Registry([Source('unreviewed',self.root/'public',visibility='public')]))
+        service = MemoryService(Registry([Source('unreviewed',self.root/'public')]))
         self.assertEqual(service.search('Nashville',self.public)['results'], [])
         with self.assertRaises(AccessDenied):
             service.get('unreviewed/note.md',self.public)
@@ -95,7 +101,7 @@ class PolicyTests(unittest.TestCase):
 
     def test_symlink_directory_denied(self):
         (self.root/'public/nested').symlink_to(self.root/'operator',target_is_directory=True)
-        source = Source('link',self.root/'public',visibility='public',approved=frozenset({'nested/note.md'}))
+        source = Source('link',self.root/'public',approvals=(Approval('nested/note.md','0'*64,(Section('whole',1,1,visibility='public'),)),))
         with self.assertRaises(AccessDenied):
             MemoryService(Registry([source])).get('link/nested/note.md',self.public)
 
@@ -127,7 +133,8 @@ class PolicyTests(unittest.TestCase):
 
     def test_bounded_long_line(self):
         (self.root/'public/note.md').write_text('x'*20000)
-        got = self.service.get('public/note.md',self.public)
+        registry = Registry([Source('public',self.root/'public',approvals=(self.approval(self.root/'public/note.md'),))])
+        got = MemoryService(registry).get('public/note.md',self.public)
         self.assertEqual(len(got['text']),16000)
         self.assertTrue(got['truncated'])
 

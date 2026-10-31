@@ -53,10 +53,14 @@ class MemoryService:
             start, end = max(0, idx-80), min(len(doc.content), idx+320)
             evidence = doc.evidence()
             evidence.update(excerpt=doc.content[start:end], score=score,
-                            start_line=doc.content.count('\n', 0, start)+1,
-                            end_line=doc.content.count('\n', 0, end)+1)
+                            start_line=doc.section.start_line + doc.content.count('\n', 0, start),
+                            end_line=min(doc.section.end_line, doc.section.start_line + doc.content.count('\n', 0, end)))
             ranked.append((score, len(matched), doc.doc_id, evidence))
         ranked.sort(key=lambda r: (-r[0], -r[1], r[2]))
+        # Revalidate selected references after ranking as well: registry revocation
+        # during iteration must not return a formerly allowed result.
+        for item in ranked[:limit]:
+            self.registry.read(item[2], ctx, item[3]['revision'])
         ctx.check()
         return self._envelope([r[3] for r in ranked[:limit]],
                              [{'id': 'authorized-lexical', 'status': 'ready'}], query=query, mode=mode,
@@ -73,7 +77,7 @@ class MemoryService:
         text = requested[:16000]
         ctx.check()
         return {'version': 1, 'status': 'ok', **doc.evidence(), 'text': text,
-                'start_line': start_line, 'lines_returned': len(text.splitlines()),
+                'start_line': start_line, 'source_line': doc.section.start_line + start_line - 1, 'lines_returned': len(text.splitlines()),
                 'truncated': len(requested) > 16000 or start_line-1+lines < len(all_lines),
                 'continuation': 'repeat with larger start_line; a single overlong line requires a specialist read' if len(requested)>16000 else None}
 
