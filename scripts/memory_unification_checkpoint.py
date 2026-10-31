@@ -6,6 +6,7 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import subprocess
 import uuid
 
 CONTROL = Path('/Volumes/carbonite/claw/data/cindylou/runtime/memory-unification')
@@ -19,6 +20,9 @@ def main():
     ap.add_argument('--note')
     ap.add_argument('--commit')
     ap.add_argument('--artifact',action='append',default=[],help='name=absolute-path')
+    ap.add_argument('--verified',action='append',default=[],help='resolved entry removed from unverified')
+    ap.add_argument('--completed',action='append',default=[],help='completed bounded deliverable')
+    ap.add_argument('--check',action='append',default=[],help='name=observed verification result')
     args=ap.parse_args()
     os.umask(0o077)
     with (CONTROL/'checkpoint.lock').open('a') as lock:
@@ -34,7 +38,19 @@ def main():
                      checkpoint_id=event_id,active_processes=[])
         state.setdefault('batches',{})[args.batch]={'status':args.status,'last_checkpoint':event_id}
         if args.commit:
-            state['commit']=args.commit
+            # Store an immutable revision, never a moving symbolic HEAD/ref.
+            state['commit']=subprocess.run(['git','-C',state['worktree'],'rev-parse',
+                '--verify','--end-of-options',args.commit+'^{commit}'],check=True,
+                capture_output=True,text=True).stdout.strip()
+        for item in args.verified:
+            state['unverified']=[old for old in state.get('unverified',[]) if old != item]
+            if item not in state.setdefault('verified',[]):state['verified'].append(item)
+        for item in args.completed:
+            if item not in state.setdefault('completed',[]):state['completed'].append(item)
+        for item in args.check:
+            name,separator,value=item.partition('=')
+            if not separator or not name or not value:ap.error('checks require name=result')
+            state.setdefault('last_checks',{})[name]=value
         for item in args.artifact:
             name,separator,value=item.partition('=')
             if not separator or not name or not Path(value).is_absolute() or not Path(value).exists():

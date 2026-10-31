@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Protocol
 
-from .policy import AccessContext, Registry
+from .policy import AccessContext, AccessDenied, Registry, StaleReference
 
 
 class NativeReader(Protocol):
@@ -19,9 +19,10 @@ class SpecialistReader(Protocol):
 
 class MemoryService:
     def __init__(self, registry: Registry, native: NativeReader | None = None,
-                 specialists: SpecialistReader | None = None):
+                 specialists: SpecialistReader | None = None, captures=None):
         self.registry, self.native = registry, native
         self.specialists = specialists
+        self.captures = captures
 
     @staticmethod
     def _envelope(results: list, backends: list, **fields):
@@ -38,6 +39,17 @@ class MemoryService:
             raise ValueError('limit must be 1..30')
         if mode not in {'lexical', 'hybrid', 'specialist'}:
             raise ValueError('unsupported search mode')
+        if domain == 'captured':
+            if mode != 'lexical':
+                raise ValueError('captured facts use their explicit private lexical reader')
+            if self.captures is None:
+                return self._envelope([], [{'id':'captured-files','status':'unavailable',
+                    'reason':'private capture store not configured'}],status='unavailable',domain=domain)
+            result = self.captures.search(query,ctx,limit=limit)
+            ctx.check()
+            return self._envelope([self._capture_evidence(r) for r in result['results']],
+                [{'id':'captured-files','status':'ready'}],status=result['status'],domain=domain,
+                mode='lexical',promoted=False,query=query)
         if domain in {'rules', 'equipment'}:
             if mode == 'hybrid':
                 raise ValueError('specialist domains do not use hybrid ranking')
@@ -89,6 +101,23 @@ class MemoryService:
             start_line: int = 1, lines: int = 80) -> dict:
         if type(start_line) is not int or start_line < 1 or type(lines) is not int or not 1 <= lines <= 200:
             raise ValueError('invalid read bounds')
+        if isinstance(doc_id,str) and doc_id.startswith('capture/'):
+            if self.captures is None:
+                raise AccessDenied('not authorized')
+            record_id = doc_id[8:]
+            history = self.captures.history(record_id,ctx)
+            record = next(r for r in history['results'] if r['record_id']==record_id)
+            if revision is not None and revision != record['revision']:
+                raise StaleReference('source changed; search again')
+            content = record['text'].splitlines()
+            requested = '\n'.join(content[start_line-1:start_line-1+lines])
+            text = requested[:16000]
+            evidence = self._capture_evidence(record)
+            evidence.pop('excerpt')  # search excerpts must not escape bounded get
+            ctx.check()
+            return {'version':1,'status':'ok',**evidence, 'text':text,
+                    'start_line':start_line,'source_line':start_line,'lines_returned':len(text.splitlines()),
+                    'truncated':len(requested)>16000 or start_line-1+lines<len(content)}
         doc = self.registry.read(doc_id, ctx, revision)
         all_lines = doc.content.splitlines()
         # Bound both line count and character count (one OCR line can be huge).
@@ -100,8 +129,26 @@ class MemoryService:
                 'truncated': len(requested) > 16000 or start_line-1+lines < len(all_lines),
                 'continuation': 'repeat with larger start_line; a single overlong line requires a specialist read' if len(requested)>16000 else None}
 
+    @staticmethod
+    def _capture_evidence(record):
+        return {'doc_id':'capture/'+record['record_id'],'revision':record['revision'],
+                'domain':'captured','visibility':record['visibility'],
+                'claim_status':'provisional' if record['effective_status']=='provisional' else 'superseded',
+                'record_status':record['effective_status'],'authority':'captured-provisional',
+                'evidence_group':record['evidence_group'],'origin':record['origin'],
+                'excerpt':record['text'][:400],'promoted':False}
+
+    def capture(self, text, ctx: AccessContext, **request):
+        ctx.check()
+        if self.captures is None:
+            return {'version':1,'status':'unavailable','saved':False,'searchable':False,'promoted':False}
+        result = self.captures.capture(text,ctx,**request)
+        ctx.check()
+        return {'version':1,'status':'ok' if result['searchable'] else 'partial',**result}
+
     def health(self):
         return {'version': 1, 'status': 'degraded',
                 'native': 'unavailable' if self.native is None else 'configured-not-probed',
                 'specialists': 'unavailable' if self.specialists is None else 'configured-not-probed',
+                'captures': 'unavailable' if self.captures is None else 'configured-not-probed',
                 'live_cutover': False}
