@@ -98,3 +98,8 @@ full-corpus semantic equivalence/model-answer/live-table evidence is incomplete.
 Do not silently promote that limited acceptance into API/voice rollout. The U4
 caller-specific entrypoint/auth/flag/rollback diff must be reviewed before a live
 switch. U5 retirement remains barred pending live-table and recovery evidence.
+
+U4 caller preparation has since progressed: see [U4-CLI-CANARY.md](U4-CLI-CANARY.md)
+for the separate default-off public campaign CLI, machine exit/status contract,
+actual two-section verification and rollback. This does not install or switch an
+existing caller and does not broaden the two-section public scope.

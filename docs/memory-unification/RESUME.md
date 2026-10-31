@@ -27,4 +27,15 @@ spike section in `NATIVE-INTEGRATION.md`. Verification commands:
 
 The public partition is a disposable index view, never a new canonical source. Its
 loopback embedding transport does not manage/restart the existing service. Preserve
-failed experiment reports. U2 overall remains in progress after the successful spike.
+failed experiment reports. This spike paragraph is historical; read STATE for
+current batch status rather than carrying its earlier U2-in-progress state forward.
+
+## Current U4 preparation
+
+U2 limited-pilot engineering and U3 private capture/import are committed. A separate
+default-off public campaign CLI has been prepared and verified against the same
+two-section native partition; see `U4-CLI-CANARY.md`. Exact current commit, private
+receipt, tests, deployment boundary and next action are recorded in STATE/JOURNAL.
+This is not full-corpus parity or an installed production caller. Do not repeat
+imports, source approvals or index generation on resume. Existing CLI/API/voice
+routes remain unchanged; no U5 retirement is authorized.
