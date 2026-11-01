@@ -75,3 +75,12 @@ projection. All 301 revisions were checked; 136 files content-reviewed is NOT
 the live operator-RPC checks or original imports to recover this state. Read the
 progress projection and continue substantive source/lineage review without
 public promotion, partition expansion or primary-reader/voice cutover.
+
+The next continuation supersedes those historical review counts and corrects
+filename-derived chronology; see `U4-LEGACY-REVIEW-CONTINUATION.md`. Read STATE's
+latest progress artifact (166/301 content-reviewed at that checkpoint; 66 still
+mixed/unresolved), not the first-pass annotation as the current review. Original
+receipts remain retained. `REMAINING-WORK-ESTIMATE.md` records a conditional
+18–30 active-hour planning range to a cutover-ready candidate, not a deployment
+or final-retirement promise. Continue STATE.next_action without repeating imports,
+canary probes or index builds.
