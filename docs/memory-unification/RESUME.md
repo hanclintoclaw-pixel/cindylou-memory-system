@@ -50,3 +50,11 @@ for primary API/browser/voice routing or broader sources from canary approval.
 Checkpointing preserves active processes unless explicitly replaced or cleared;
 use `--active-process '<JSON with positive pid>'` for a verified running instance
 and `--clear-active-processes` only after verified shutdown.
+
+The next tool-client preparation is documented in `U4-TOOL-CANARY.md`.
+`unification.canary_tool` calls the approved API; the optional OpenClaw plugin
+candidate remains separate from all primary routes. Read STATE for its pinned
+release, actual verification/discovery receipts and pending deployment boundary.
+Do not mistake isolated runtime discovery or the registration harness for live
+Gateway installation. Preserve the complete release layout (Python modules plus
+nested plugin), owner-only token, requester-scoped grant and invocation guards.

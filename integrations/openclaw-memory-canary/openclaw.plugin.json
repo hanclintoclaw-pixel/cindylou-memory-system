@@ -1,0 +1,16 @@
+{
+  "id": "cindylou-memory-canary",
+  "name": "Cindy public memory canary",
+  "description": "Separate optional public-only retrieval pilot. Existing memory tools are not replaced.",
+  "contracts": {"tools": ["cindylou_memory_canary"]},
+  "toolMetadata": {"cindylou_memory_canary": {"optional": true}},
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {"type": "boolean", "default": false},
+      "tokenFile": {"type": "string", "description": "Trusted local absolute owner-only route-token file; never the token value."},
+      "port": {"type": "integer", "minimum": 1024, "maximum": 65535, "default": 18091}
+    }
+  }
+}
