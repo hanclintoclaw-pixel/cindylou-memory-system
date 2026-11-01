@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -36,7 +37,16 @@ class RulesLineageTests(unittest.TestCase):
     def run_trace(self, **kwargs):
         return lineage.trace(self.queue, self.root, self.ocr,
                              kwargs.get('routes', {'book': 'book.md'}),
-                             kwargs.get('sources', [self.name]))
+                             kwargs.get('sources', [self.name]),
+                             alias_root=kwargs.get('alias_root'), aliases=kwargs.get('aliases'))
+
+    def alias(self, text=None):
+        root = self.root / 'alternate'
+        root.mkdir(exist_ok=True)
+        path = root / 'old-book.md'
+        path.write_bytes(self.target.read_bytes() if text is None else text)
+        self.save(reference=str(path))
+        return root, path
 
     def test_page_bound_match_hashes_not_admission(self):
         report = self.run_trace()
@@ -122,6 +132,90 @@ class RulesLineageTests(unittest.TestCase):
         with patch.object(lineage.BoundInputs, 'verify', drift):
             with self.assertRaisesRegex(ValueError, 'generation changed'):
                 self.run_trace()
+
+    def test_explicit_alias_binds_both_current_revisions_without_historical_claim(self):
+        root, path = self.alias()
+        report = self.run_trace(alias_root=root, aliases={'book': path.name})
+        row = report['rows'][0]
+        self.assertEqual(row['status'], 'exact-substring-on-ocr-page')
+        self.assertEqual(row['reference_status'], 'explicit-byte-identical-alias-opened')
+        self.assertEqual(row['reference_path'], str(path))
+        self.assertEqual(row['original']['path'], str(self.target))
+        alias = row['reference_alias']
+        self.assertEqual(alias, report['verified_aliases']['book'])
+        self.assertEqual(alias['revision'], alias['target_revision'])
+        self.assertEqual(alias['comparison'], 'whole-file-byte-identical')
+        self.assertFalse(alias['historical_identity_verified'])
+
+    def test_alias_never_implicitly_selected(self):
+        self.alias()
+        with self.assertRaisesRegex(ValueError, 'disagrees'):
+            self.run_trace()
+
+    def test_changed_alias_rejected_even_when_excerpt_still_matches(self):
+        root, path = self.alias(self.target.read_bytes() + b'additional historical material\n')
+        with self.assertRaisesRegex(ValueError, 'bytes disagree'):
+            self.run_trace(alias_root=root, aliases={'book': path.name})
+
+    def test_missing_alias_rejected_without_target_fallback(self):
+        root, path = self.alias()
+        path.unlink()
+        with self.assertRaisesRegex(ValueError, 'missing'):
+            self.run_trace(alias_root=root, aliases={'book': path.name})
+
+    def test_alias_configuration_must_be_explicit_and_label_bound(self):
+        root, path = self.alias()
+        for kwargs in ({'alias_root': root}, {'aliases': {'book': path.name}},
+                       {'alias_root': root, 'aliases': {}},
+                       {'alias_root': root, 'aliases': {'unknown': path.name}}):
+            with self.assertRaisesRegex(ValueError, 'explicit alias root'):
+                self.run_trace(**kwargs)
+
+    def test_unsafe_and_symlink_aliases_rejected(self):
+        root, path = self.alias()
+        link = root / 'link.md'
+        link.symlink_to(path)
+        for relative in ('../ocr/book.md', str(path), '.hidden', 'link.md'):
+            with self.assertRaises(ValueError):
+                self.run_trace(alias_root=root, aliases={'book': relative})
+
+    def test_alias_targets_cannot_overlap_routes_or_other_aliases(self):
+        with self.assertRaisesRegex(ValueError, 'overlapping alias'):
+            self.run_trace(alias_root=self.ocr, aliases={'book': 'book.md'})
+        root, path = self.alias()
+        (self.ocr / 'second.md').write_bytes(self.target.read_bytes())
+        with self.assertRaisesRegex(ValueError, 'overlapping alias'):
+            self.run_trace(routes={'book': 'book.md', 'other': 'second.md'},
+                alias_root=root, aliases={'book': path.name, 'other': path.name})
+
+    def test_alias_drift_rejected_before_report(self):
+        root, path = self.alias()
+        verify = lineage.BoundInputs.verify
+        def drift(bound):
+            path.write_bytes(path.read_bytes() + b'changed')
+            verify(bound)
+        with patch.object(lineage.BoundInputs, 'verify', drift):
+            with self.assertRaisesRegex(ValueError, 'generation changed'):
+                self.run_trace(alias_root=root, aliases={'book': path.name})
+
+    def test_alias_selection_does_not_authorize_other_reference(self):
+        root, path = self.alias()
+        self.save(reference=str(root / 'not-selected.md'))
+        with self.assertRaisesRegex(ValueError, 'disagrees'):
+            self.run_trace(alias_root=root, aliases={'book': path.name})
+
+    def test_explicit_alias_cli_matches_module_rows_and_revisions(self):
+        root, path = self.alias()
+        report = self.run_trace(alias_root=root, aliases={'book': path.name})
+        output = self.root / 'result.json'
+        result = subprocess.run([sys.executable, lineage.__file__, '--queue', str(self.queue),
+            '--source-root', str(self.root), '--ocr-root', str(self.ocr), '--route', 'book=book.md',
+            '--source', self.name, '--alias-root', str(root), '--alias', 'book=' + path.name,
+            '--output', str(output)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        actual = json.loads(output.read_text())
+        for key in ('rows', 'original_revisions', 'verified_aliases'):
+            self.assertEqual(actual[key], report[key])
 
 
 if __name__ == '__main__':

@@ -113,3 +113,15 @@ and alternate reference paths) remain retained, not a global-lineage success.
 Five context/page-tail readings reveal attribution traps and unequal OCR/printed
 page labels; no global offset, edition or rules-authority clearance follows.
 STATE points to the newest validated cumulative artifacts and preservation evidence.
+
+The next context/alias pass advances content review to 250/301, with 51 unread
+and 133 reviewed files still mixed/unresolved; see
+`U4-AGGREGATE-CONTEXT-AND-ALIASES.md`. Eight whole files were actually read in 29
+bounded windows. Four current-route aggregates have 404 exact page-bound OCR
+substring rows plus two imported-NPC prefixes, not rules/claim clearance. Five
+original contexts include a clipped sentence whose continuation changes an
+apparent Matrix access prohibition into publicity guidance. The old Critters
+workspace path is absent: all 132 references remain unresolved, zero aliases
+admitted. Optional aliases require explicit selection and complete current-byte
+identity; they do not verify historical identity. Continue STATE.next_action,
+preserving prior failures, originals, quarantine and all deployment boundaries.
