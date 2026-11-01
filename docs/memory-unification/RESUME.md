@@ -92,3 +92,15 @@ Imported scan headings are generated metadata, not human date evidence. STATE li
 the v2 mechanical report, cumulative annotations, preservation and tests. Continue
 the 24 unread scanned-note derivatives / remaining summary comparisons and 82
 general-rules derivatives without changing primary readers, approvals or sources.
+
+The next invocation adds 24 scan-note and 18 small general-file readings: current
+content review is 237/301, with 64 unread and 120 mixed/unresolved source reviews.
+See `U4-SCAN-AND-RULES-TRIAGE.md`. All 32 substantive summaries have only partial
+extraction comparisons. The general tier is multi-megabyte citation aggregates,
+not merely short profiles. STATE links a mechanical 164-general-facet inventory
+(including 82 previously reviewed placeholder facets), bounded read windows and
+ten unpaginated prefix comparisons to four imported campaign/homebrew texts.
+Those passage comparisons do not count as full readings of the larger aggregates.
+The inventory performs zero semantic reviews and its embedded source references
+are not automatically opened or admitted. Retain the initial parser rejection and
+truncation limits; continue STATE.next_action without imports, live probes or rebuilds.
