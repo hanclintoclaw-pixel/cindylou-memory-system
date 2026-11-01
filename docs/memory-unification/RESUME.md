@@ -84,3 +84,11 @@ receipts remain retained. `REMAINING-WORK-ESTIMATE.md` records a conditional
 18–30 active-hour planning range to a cutover-ready candidate, not a deployment
 or final-retirement promise. Continue STATE.next_action without repeating imports,
 canary probes or index builds.
+
+The fourth batch adds a reproducible session-passage comparator and advances content
+review to 195/301 files; see `U4-SESSION-LINEAGE-REVIEW.md`. Mechanical tracing of all
+58 session-note files / 59 chunks is NOT content clearance or PDF verification.
+Imported scan headings are generated metadata, not human date evidence. STATE links
+the v2 mechanical report, cumulative annotations, preservation and tests. Continue
+the 24 unread scanned-note derivatives / remaining summary comparisons and 82
+general-rules derivatives without changing primary readers, approvals or sources.

@@ -33,10 +33,16 @@ adequate eligible-corpus coverage/equivalence, answer-quality acceptance, remain
 capture/dreaming/closeout callers, voice shadow/live validation and U5 retirement
 remain open. Earlier limited-pilot engineering gates do not close these gates.
 
-The current review projection is 166/301 files content-reviewed, 135 unread and
-66 read files requiring unresolved/mixed lineage follow-up. These are source-level
-counts, not unique-fact counts or a project completion percentage. The discovered
-multi-session filename/date error makes chronology a particular uncertainty.
+The latest review projection is 195/301 files content-reviewed, 106 unread and
+78 read files requiring unresolved/mixed lineage follow-up (184 source tasks).
+Mechanical passage tracing separately matches all 59 chunks in 58 session-note
+files; it does not establish OCR accuracy, played outcomes or content clearance.
+These are source-level counts, not unique-fact counts or a project completion
+percentage. Multi-date scan files, conditional scenario branches and inferred-date
+conflicts make chronology and plan-vs-event admission particular uncertainties.
+The original 18–30-hour range above is retained, not reset or reduced by file count;
+the campaign note/summary pass and primary-reader shadow re-estimation gates have
+not yet been reached. See `U4-SESSION-LINEAGE-REVIEW.md` for this batch's evidence.
 
 ## Assumptions and re-estimation triggers
 
