@@ -66,3 +66,12 @@ turn's admission/invocation remains to be observed. Captured plugin modules must
 derive the adjacent Python release from host-selected original `api.source`, not
 relocated `import.meta.url`. Do not revert to the initially prepared release or
 change primary routing while expanding evidence.
+
+Fresh Discord turn admission/search/revision-bound reads were subsequently
+observed on 2026-11-01. The first private legacy content-review pass is in
+`U4-DISCORD-AND-LEGACY-REVIEW.md`; STATE links the exact receipts and progress
+projection. All 301 revisions were checked; 136 files content-reviewed is NOT
+136 lineage-cleared sources: 44 of those remain unresolved/mixed. Do not repeat
+the live operator-RPC checks or original imports to recover this state. Read the
+progress projection and continue substantive source/lineage review without
+public promotion, partition expansion or primary-reader/voice cutover.
