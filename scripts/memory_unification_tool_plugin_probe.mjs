@@ -1,8 +1,10 @@
 // Registration harness ONLY: no claim of real Gateway discovery/admission.
 import plugin from '../integrations/openclaw-memory-canary/index.mjs';
+import {fileURLToPath} from 'node:url';
 let definition;
 const [tokenFile,port,mode]=process.argv.slice(2);
-plugin.register({pluginConfig:{enabled:mode==='enabled',tokenFile,port:Number(port)},
+plugin.register({source:fileURLToPath(new URL('../integrations/openclaw-memory-canary/index.mjs',import.meta.url)),
+  pluginConfig:{enabled:mode==='enabled',tokenFile,port:Number(port)},
   registerTool(factory,options) {
     if (options.name!=='cindylou_memory_canary' || options.optional!==true || factory.contextVersion!==2) throw new Error('invalid registration');
     definition=factory;

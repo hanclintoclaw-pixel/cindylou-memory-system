@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {PassThrough} from 'node:stream';
 import test from 'node:test';
 import plugin,{createTool,NAME} from '../../integrations/openclaw-memory-canary/index.mjs';
@@ -138,4 +141,29 @@ test('real isolated Python failure is sanitized and disabled remains default',as
   assert.equal(result.details.status,'unavailable');
   assert.equal(JSON.stringify(result).includes('/missing'),false);
   assert.equal((await createTool({},context()).execute('id',{})).details.status,'disabled');
+});
+
+test('captured host module uses original source release for real Python child',async()=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'canary-captured-'));
+  try {
+    const captured=path.join(root,'captured');
+    const release=path.join(root,'original-release');
+    fs.mkdirSync(captured);
+    fs.mkdirSync(path.join(release,'unification'),{recursive:true});
+    for (const name of ['index.mjs','tool-parameters.json'])
+      fs.copyFileSync(new URL('../../integrations/openclaw-memory-canary/'+name,import.meta.url),path.join(captured,name));
+    fs.writeFileSync(path.join(release,'unification','__init__.py'),'');
+    fs.writeFileSync(path.join(release,'unification','canary_tool.py'),
+      'import json\ndef main(args):\n print('+JSON.stringify(JSON.stringify(synthetic()))+')\n return 0\n');
+    const loaded=await import(pathToFileURL(path.join(captured,'index.mjs')).href);
+    let factory;
+    loaded.default.register({source:path.join(release,'integrations','openclaw-memory-canary','index.mjs'),
+      pluginConfig:config,registerTool(value){factory=value;}});
+    const result=await factory.create(context()).execute('captured-host',{operation:'health'});
+    assert.deepEqual(result,synthetic());
+    loaded.default.register({pluginConfig:config,registerTool(value){factory=value;}});
+    assert.equal((await factory.create(context()).execute('missing-source',{operation:'health'})).details.status,'unavailable');
+    loaded.default.register({source:'relative/index.mjs',pluginConfig:config,registerTool(value){factory=value;}});
+    assert.equal((await factory.create(context()).execute('relative-source',{operation:'health'})).details.status,'unavailable');
+  } finally {fs.rmSync(root,{recursive:true,force:true});}
 });

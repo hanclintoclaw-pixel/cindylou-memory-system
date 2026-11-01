@@ -1,6 +1,7 @@
 // Prepared optional tool plugin. Import/registration performs no token/network I/O.
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {dirname,isAbsolute,resolve} from 'node:path';
 import parameters from './tool-parameters.json' with {type:'json'};
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -14,7 +15,7 @@ function failure(status) {
   return {content:[{type:'text',text:JSON.stringify(details)}],details,isError:true};
 }
 
-export function createTool(config, context, spawnChild=spawn) {
+export function createTool(config, context, spawnChild=spawn, codeRoot=ROOT) {
   config={enabled:config.enabled,tokenFile:config.tokenFile,port:config.port};
   // A public-only tool never elevates on owner/sender/session-key identity.
   if (context.sandboxed || typeof context.assertInvocationCurrent !== 'function') return null;
@@ -26,6 +27,7 @@ export function createTool(config, context, spawnChild=spawn) {
       try {context.assertInvocationCurrent();} catch {return failure('denied');}
       if (config.enabled !== true) return failure('disabled');
       if (signal?.aborted) return failure('unavailable');
+      if (typeof codeRoot !== 'string' || !isAbsolute(codeRoot)) return failure('unavailable');
       if (typeof config.tokenFile !== 'string' || !config.tokenFile.startsWith('/') ||
           !Number.isInteger(config.port ?? 18091) || (config.port ?? 18091)<1024 || (config.port ?? 18091)>65535) return failure('unavailable');
       let raw;
@@ -45,7 +47,7 @@ export function createTool(config, context, spawnChild=spawn) {
         const abort = () => stop();
         try {
           context.assertInvocationCurrent();
-          child=spawnChild(PYTHON,['-I','-c',BOOT,ROOT,'--enable-canary',
+          child=spawnChild(PYTHON,['-I','-c',BOOT,codeRoot,'--enable-canary',
             '--token-file',config.tokenFile,'--port',String(config.port ?? 18091),'--timeout','12'],
             {cwd:'/',stdio:['pipe','pipe','ignore'],env:{PATH:'/usr/bin:/bin'}});
           timer=setTimeout(stop,15000);
@@ -86,8 +88,13 @@ export function createTool(config, context, spawnChild=spawn) {
 export default {
   id:'cindylou-memory-canary',name:'Cindy public memory canary',
   register(api) {
+    // OpenClaw executes captured plugin modules from a different filesystem root.
+    // Its host-selected original source, not import.meta.url/runtimeSource, owns
+    // the adjacent pinned Python release. Missing host provenance fails closed.
+    const codeRoot = typeof api.source === 'string' && isAbsolute(api.source)
+      ? resolve(dirname(api.source),'../..') : null;
     api.registerTool({contextVersion:2,create(context) {
-      return createTool({...api.pluginConfig},context);
+      return createTool({...api.pluginConfig},context,spawn,codeRoot);
     }},{name:NAME,optional:true});
   },
 };
