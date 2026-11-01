@@ -25,21 +25,25 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def verify(registry, partition, output_root):
+def verify(registry, partition, output_root, installed_command=None):
     os.umask(0o077)
     output = output_root / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     output.mkdir(parents=True, exist_ok=False, mode=0o700)
-    report = {'version': 1, 'scope': 'isolated-public-campaign-cli', 'production_installed': False,
+    report = {'version': 1, 'scope': 'installed-public-campaign-cli' if installed_command else 'isolated-public-campaign-cli',
+              'production_installed': bool(installed_command),
               'registry': str(registry), 'partition': str(partition), 'checks': [], 'passed': False,
               'latency_scope': 'fresh CLI process including startup/search/shutdown; not warm retrieval',
               'native_runtime_state': 'supplied isolated partition may update indexes/recall state'}
     path = output / 'canary-verification.private.json'
     base = [sys.executable, '-m', 'unification.canary_cli', '--registry', str(registry),
             '--partition', str(partition)]
+    if installed_command:
+        base = [str(installed_command.absolute())]
+        report['installed_command'] = base[0]
     def invoke(label, command, code, *, enabled=True, predicate=lambda payload: True):
         start = time.monotonic()
         run = subprocess.run(base + (['--enable-canary'] if enabled else []) + command,
-                             cwd=ROOT, capture_output=True, text=True, timeout=45)
+                             cwd='/' if installed_command else ROOT, capture_output=True, text=True, timeout=70)
         elapsed = time.monotonic() - start
         payload = json.loads(run.stdout) if run.stdout else {}
         passed = run.returncode == code and predicate(payload)
@@ -57,6 +61,14 @@ def verify(registry, partition, output_root):
         inputs = [registry, partition/'partition.json', partition/'openclaw.json']
         inputs += [doc.source.root / doc.doc_id.split('#')[0].split('/', 1)[1] for doc in docs]
         inputs += list((ROOT/'unification').glob('*.py')) + list((ROOT/'unification').glob('*.mjs')) + [Path(__file__)]
+        if installed_command:
+            release = installed_command.resolve(strict=True).parent
+            manifest = json.loads((release/'release.json').read_text())
+            if manifest['registry'] != str(registry) or manifest['partition'] != str(partition):
+                raise ValueError('installed inputs mismatch')
+            inputs += [installed_command,release/'release.json',release/'launch.py']
+            inputs += [release/name for name in manifest['files']]
+            report['installed_commit'] = manifest['commit']
         before = {str(p): sha(p) for p in sorted(set(inputs))}
         report['input_revisions_before'] = before
         report['coverage'] = 'partial'
@@ -105,5 +117,6 @@ if __name__ == '__main__':
     ap.add_argument('--registry', type=Path, required=True)
     ap.add_argument('--partition', type=Path, required=True)
     ap.add_argument('--output-root', type=Path, required=True)
+    ap.add_argument('--installed-command', type=Path, help='exercise installed pinned entrypoint from an unrelated directory')
     args = ap.parse_args()
-    raise SystemExit(verify(args.registry, args.partition, args.output_root))
+    raise SystemExit(verify(args.registry, args.partition, args.output_root, args.installed_command))

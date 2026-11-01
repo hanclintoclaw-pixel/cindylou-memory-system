@@ -93,3 +93,32 @@ switching an existing caller, produce its default-off routing diff, equivalent
 output contract, trusted context, timeout/degradation handling and rollback
 receipt; broaden public section coverage or explicitly retain limited-canary
 scope. Voice remains gated by its own operational skill and live-table evidence.
+
+## Approved separate installation
+
+JackalMoreau approved the separate opt-in canary in Discord request
+`1566240141302046811` on 2026-10-31. This authorizes installing this command,
+not changing existing CLI/API/voice routes, disclosing more sources or retiring
+anything. `scripts/memory_unification_canary_install.py` exports only committed
+`unification/` blobs to a version-pinned code-tier release. The entrypoint
+`~/.local/bin/cindylou-canary` is published as an exclusive symlink; an existing
+command/release is never overwritten. Private input paths and installation
+receipts remain local. No daemon or shell-profile change is required.
+
+The launcher uses an absolute Python interpreter with isolated mode, verifies
+exported code hashes before import, and fixes the reviewed registry/partition.
+Query arguments cannot override those inputs or abbreviate configuration flags.
+Disabled calls exit before release imports or source reads. The response's
+`installed_entrypoint` distinguishes installation from the existing
+`production_integration: false` flag (no primary-reader integration).
+
+```sh
+cindylou-canary --enable-canary health
+cindylou-canary --enable-canary search --q 'Tom Erlichman'
+cindylou-canary health  # disabled, exit 2; rollback without deleting data
+```
+
+The verifier's `--installed-command` option exercises the installed command from
+`/`, checks the installed inputs and hashes, and retains the same 14 positive,
+negative and rollback checks. Installation and measured results are recorded
+in private STATE/JOURNAL rather than inferred from this recipe.
