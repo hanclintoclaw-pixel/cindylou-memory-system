@@ -36,6 +36,11 @@ U2 limited-pilot engineering and U3 private capture/import are committed. A sepa
 default-off public campaign CLI has been prepared and verified against the same
 two-section native partition; see `U4-CLI-CANARY.md`. Exact current commit, private
 receipt, tests, deployment boundary and next action are recorded in STATE/JOURNAL.
-This is not full-corpus parity or an installed production caller. Do not repeat
+The separate CLI was subsequently approved and installed; see STATE and
+`U4-CLI-CANARY.md` for its pinned release/installed receipt. Do not repeat
 imports, source approvals or index generation on resume. Existing CLI/API/voice
 routes remain unchanged; no U5 retirement is authorized.
+
+The subsequent `U4-API-CANARY.md` describes a tested foreground API candidate,
+not an installed API service. Its transient verification listener was stopped.
+Do not infer permission for an API/browser/voice change from the CLI approval.

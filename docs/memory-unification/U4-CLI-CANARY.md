@@ -122,3 +122,8 @@ The verifier's `--installed-command` option exercises the installed command from
 `/`, checks the installed inputs and hashes, and retains the same 14 positive,
 negative and rollback checks. Installation and measured results are recorded
 in private STATE/JOURNAL rather than inferred from this recipe.
+
+Installed CLI result: pinned release `e8701c1af7610dbbe18e3379f09ec8a71d8c4f1d`,
+**14/14 installed caller checks passed**, with selected existing primary
+CLI/API/voice/config hashes unchanged. The installed CLI stays on that release
+when the development branch advances. It has not acquired the later API code.

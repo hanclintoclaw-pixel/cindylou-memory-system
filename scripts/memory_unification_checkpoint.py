@@ -23,6 +23,7 @@ def main():
     ap.add_argument('--verified',action='append',default=[],help='resolved entry removed from unverified')
     ap.add_argument('--completed',action='append',default=[],help='completed bounded deliverable')
     ap.add_argument('--check',action='append',default=[],help='name=observed verification result')
+    ap.add_argument('--live-change',action='append',default=[],help='bounded installed change; not a broader deployment claim')
     args=ap.parse_args()
     os.umask(0o077)
     with (CONTROL/'checkpoint.lock').open('a') as lock:
@@ -47,6 +48,8 @@ def main():
             if item not in state.setdefault('verified',[]):state['verified'].append(item)
         for item in args.completed:
             if item not in state.setdefault('completed',[]):state['completed'].append(item)
+        for item in args.live_change:
+            if item not in state.setdefault('live_changes',[]):state['live_changes'].append(item)
         for item in args.check:
             name,separator,value=item.partition('=')
             if not separator or not name or not value:ap.error('checks require name=result')
