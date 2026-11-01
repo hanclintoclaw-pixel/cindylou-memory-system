@@ -104,3 +104,12 @@ Those passage comparisons do not count as full readings of the larger aggregates
 The inventory performs zero semantic reviews and its embedded source references
 are not automatically opened or admitted. Retain the initial parser rejection and
 truncation limits; continue STATE.next_action without imports, live probes or rebuilds.
+
+The subsequent bounded rules-lineage pass advances content review to 242/301,
+with 59 unread and 125 mixed/unresolved files; see `U4-RULES-EXCERPT-LINEAGE.md`.
+Only five aggregates have the new six-original OCR trace: 289 exact substring
+locations, three unmapped WordPress rows. Failed global attempts (missing targets
+and alternate reference paths) remain retained, not a global-lineage success.
+Five context/page-tail readings reveal attribution traps and unequal OCR/printed
+page labels; no global offset, edition or rules-authority clearance follows.
+STATE points to the newest validated cumulative artifacts and preservation evidence.
