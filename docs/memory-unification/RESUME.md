@@ -125,3 +125,13 @@ workspace path is absent: all 132 references remain unresolved, zero aliases
 admitted. Optional aliases require explicit selection and complete current-byte
 identity; they do not verify historical identity. Continue STATE.next_action,
 preserving prior failures, originals, quarantine and all deployment boundaries.
+
+The next lexical-contamination pass advances review to 256/301 files, with 45
+unread and 139 reviewed mixed/unresolved; see `U4-LEXICAL-CONTAMINATION-REVIEW.md`.
+Six full files were read in 12 bounded windows. All 155 selected citation rows
+copy exactly from six explicitly routed OCR originals, yet three context-checked
+IC hits are merely broken-word suffixes. Five actual context readings distinguish
+those from intrusion countermeasures, a named Humanis worm from the organization,
+and a spirit-host table from Matrix mechanics. STATE links source-bound review,
+CLI parity, 32 targeted passing tests and selected preservation receipts. No new
+implementation, full-suite rerun, source admission or reader cutover is implied.
