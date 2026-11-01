@@ -58,3 +58,11 @@ release, actual verification/discovery receipts and pending deployment boundary.
 Do not mistake isolated runtime discovery or the registration harness for live
 Gateway installation. Preserve the complete release layout (Python modules plus
 nested plugin), owner-only token, requester-scoped grant and invocation guards.
+
+The separate optional tool was subsequently approved in `1566253226179690577`
+and enabled at corrected pinned release `451748b`; see STATE for exact receipts.
+Live operator RPC and disable/re-enable rollback passed, but a new Discord model
+turn's admission/invocation remains to be observed. Captured plugin modules must
+derive the adjacent Python release from host-selected original `api.source`, not
+relocated `import.meta.url`. Do not revert to the initially prepared release or
+change primary routing while expanding evidence.

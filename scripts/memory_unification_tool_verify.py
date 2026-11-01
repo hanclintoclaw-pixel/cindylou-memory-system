@@ -19,7 +19,7 @@ from unification.policy import AccessContext
 from unification.registry import load_registry
 
 
-def verify(state_path, output_root, caller='stdio', code_root=ROOT):
+def verify(state_path, output_root, caller='stdio', code_root=ROOT, gateway_session=None):
     os.umask(0o077)
     output = output_root/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     output.mkdir(parents=True, exist_ok=False, mode=0o700)
@@ -28,6 +28,11 @@ def verify(state_path, output_root, caller='stdio', code_root=ROOT):
               'passed': False, 'coverage': 'partial', 'checks': [],
               'latency_scope': 'fresh tool process plus HTTP plus per-request native lifecycle; not warm p95',
               'native_runtime_state': 'isolated partition index/recall state may update'}
+    if caller == 'gateway':
+        if not gateway_session:
+            raise ValueError('gateway caller requires exact target session')
+        report['scope'] = 'actual live Gateway operator RPC tool invocation; not a Discord model turn'
+        report['rollback_scope'] = 'live config disable/re-enable verified in separate deployment receipt'
 
     def check(label, passed, **fields):
         report['checks'].append({'label': label, 'passed': bool(passed), **fields})
@@ -80,19 +85,30 @@ def verify(state_path, output_root, caller='stdio', code_root=ROOT):
             command = (['node', str(code_root/'scripts/memory_unification_tool_plugin_probe.mjs'),
                         str(token_file), str(port), 'enabled' if enabled else 'disabled'] if caller == 'plugin'
                        else base+(['--enable-canary'] if enabled else []))
+            if caller == 'gateway':
+                command = ['openclaw', 'gateway', 'call', 'tools.invoke', '--params', json.dumps({
+                    'name': 'cindylou_memory_canary', 'agentId': 'cindylou',
+                    'sessionKey': gateway_session, 'args': request}), '--timeout', '25000', '--json']
             run = subprocess.run(command,
-                                 input=json.dumps(request).encode(), cwd='/', capture_output=True, timeout=20)
+                                 input=json.dumps(request).encode(), cwd='/', capture_output=True, timeout=35)
             payload = json.loads(run.stdout)
+            if caller == 'gateway':
+                if payload.get('ok') is not True or payload.get('source') != 'plugin':
+                    raise RuntimeError('Gateway did not admit plugin invocation')
+                payload = payload['output']
             details = payload['details']
             check(label, details['status'] == expected and predicate(details)
                   and json.loads(payload['content'][0]['text']) == details
-                  and run.returncode == {'disabled': 2, 'invalid_request': 2, 'denied': 3,
-                                         'stale': 4, 'unavailable': 5}.get(expected, 0),
+                  and payload['isError'] == (expected not in ['ok', 'empty'])
+                  and run.returncode == (0 if caller == 'gateway' else
+                      {'disabled': 2, 'invalid_request': 2, 'denied': 3,
+                       'stale': 4, 'unavailable': 5}.get(expected, 0)),
                   status=details['status'], exit_code=run.returncode,
                   response_sha256=hashlib.sha256(run.stdout).hexdigest(), elapsed_s=time.monotonic()-start)
             return details
 
-        call('disabled before enabled use', {'operation': 'health'}, 'disabled', enabled=False)
+        if caller != 'gateway':
+            call('disabled before enabled use', {'operation': 'health'}, 'disabled', enabled=False)
         call('actual tool authenticated health', {'operation': 'health'}, 'ok')
         for doc in docs:
             query = Path(doc.doc_id.split('#')[0]).stem.replace('-', ' ')
@@ -109,9 +125,12 @@ def verify(state_path, output_root, caller='stdio', code_root=ROOT):
                  and p['evidence_group'] == hit['evidence_group'] and 'excerpt' not in p)
         call('tool stale revision preserved', {'operation': 'get', 'doc_id': docs[0].doc_id, 'revision': '0'*64}, 'stale')
         call('tool unapproved source denied', {'operation': 'get', 'doc_id': 'workspace/PRIVATE.md', 'revision': '0'*64}, 'denied')
-        call('tool authority override rejected', {'operation': 'search', 'query': 'Tom', 'audience': 'operator'}, 'invalid_request')
-        call('tool oversized read rejected', {'operation': 'get', 'doc_id': docs[0].doc_id, 'revision': docs[0].revision, 'lines': 201}, 'invalid_request')
-        call('tool disabled after enabled calls', {'operation': 'health'}, 'disabled', enabled=False)
+        if caller == 'gateway':
+            call('tool incomplete search rejected', {'operation': 'search'}, 'invalid_request')
+        else:
+            call('tool authority override rejected', {'operation': 'search', 'query': 'Tom', 'audience': 'operator'}, 'invalid_request')
+            call('tool oversized read rejected', {'operation': 'get', 'doc_id': docs[0].doc_id, 'revision': docs[0].revision, 'lines': 201}, 'invalid_request')
+            call('tool disabled after enabled calls', {'operation': 'health'}, 'disabled', enabled=False)
         report['inputs_after'] = hashes()
         check('code authority and selected existing callers unchanged', report['inputs_before'] == report['inputs_after'])
         final = subprocess.run(['ps', '-p', str(pid), '-o', 'command='], capture_output=True, text=True, check=True).stdout
@@ -129,10 +148,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--output-root', type=Path, required=True)
-    parser.add_argument('--caller', choices=['stdio', 'plugin'], default='stdio')
+    parser.add_argument('--caller', choices=['stdio', 'plugin', 'gateway'], default='stdio')
+    parser.add_argument('--gateway-session')
     parser.add_argument('--code-root', type=Path, default=ROOT)
     args = parser.parse_args()
-    receipt, report = verify(args.state, args.output_root, args.caller, args.code_root.resolve())
+    receipt, report = verify(args.state, args.output_root, args.caller, args.code_root.resolve(), args.gateway_session)
     print(json.dumps({'receipt': str(receipt), 'passed': report['passed'], 'checks': len(report['checks'])}))
     return 0 if report['passed'] else 1
 
