@@ -24,7 +24,15 @@ def main():
     ap.add_argument('--completed',action='append',default=[],help='completed bounded deliverable')
     ap.add_argument('--check',action='append',default=[],help='name=observed verification result')
     ap.add_argument('--live-change',action='append',default=[],help='bounded installed change; not a broader deployment claim')
+    processes=ap.add_mutually_exclusive_group()
+    processes.add_argument('--active-process',action='append',type=json.loads,
+                           help='replace active process records with these JSON objects')
+    processes.add_argument('--clear-active-processes',action='store_true',
+                           help='explicitly clear records after verified shutdown')
     args=ap.parse_args()
+    if args.active_process and any(not isinstance(item,dict) or type(item.get('pid')) is not int
+                                  or item['pid'] <= 0 for item in args.active_process):
+        ap.error('active processes require JSON objects with a positive integer pid')
     os.umask(0o077)
     with (CONTROL/'checkpoint.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
@@ -36,7 +44,11 @@ def main():
         event_id=str(uuid.uuid4())
         now=datetime.now(timezone.utc).isoformat()
         state.update(updated_at=now,current_batch=args.batch,next_action=args.next_action,
-                     checkpoint_id=event_id,active_processes=[])
+                     checkpoint_id=event_id)
+        if args.active_process is not None:
+            state['active_processes']=args.active_process
+        elif args.clear_active_processes:
+            state['active_processes']=[]
         state.setdefault('batches',{})[args.batch]={'status':args.status,'last_checkpoint':event_id}
         if args.commit:
             # Store an immutable revision, never a moving symbolic HEAD/ref.

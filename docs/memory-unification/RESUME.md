@@ -41,6 +41,12 @@ The separate CLI was subsequently approved and installed; see STATE and
 imports, source approvals or index generation on resume. Existing CLI/API/voice
 routes remain unchanged; no U5 retirement is authorized.
 
-The subsequent `U4-API-CANARY.md` describes a tested foreground API candidate,
-not an installed API service. Its transient verification listener was stopped.
-Do not infer permission for an API/browser/voice change from the CLI approval.
+The subsequent API listener was separately approved in request
+`1566243029671485605` and started from a hash-checked, pinned release on
+127.0.0.1:18091. Read `U4-API-CANARY.md` and STATE's active process/private receipt
+before any restart. There is no autostart; verify current process identity and
+authenticated health rather than assuming it survived. Do not infer permission
+for primary API/browser/voice routing or broader sources from canary approval.
+Checkpointing preserves active processes unless explicitly replaced or cleared;
+use `--active-process '<JSON with positive pid>'` for a verified running instance
+and `--clear-active-processes` only after verified shutdown.
