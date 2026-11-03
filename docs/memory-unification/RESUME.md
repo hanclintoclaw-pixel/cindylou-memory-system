@@ -291,3 +291,36 @@ expansion,primary reader/routing/config/voice/source-rights or U5 changes. Retai
 conditional18–30active-hour estimate and all supporting-passage/claim-level paired-answer/
 eligible-source/integration/capture/shadow/voice/live-table/retirement gates. Stop after
 Batch16;parent verifies/reports;Batch17 not started.
+
+The next bounded continuation is Batch17;see
+`U4-SOURCE-READ-COVERAGE-CHECKPOINT.md`. The three remaining descriptions were
+fully read in104 contiguous original-byte-bound <=80line/6000original-character
+windows. Cumulative301/301 content-reviewed,zero unread,184 reviewed mixed/unresolved,
+184 source tasks,1206 findings(107 new),zero promoted,unique claims null;prior298
+annotations unchanged. This is queued-file read coverage,not claim-level clearance
+or overall completion. All32 substantive summaries remain partial/mixed.
+All2583 selected references across26 absentlegacytargets remain unresolved/unopened,
+including two unpaginated rows;no consistent trace subset,tracer/trace-CLI parity,
+aliases,guessed remaps or admission. Eight independent current Critters OCR windows
+cover four complete marker intervals(9/14/37/40),including terminal lines;not old-path
+resolution/historical-copy proof. Subjects,conditions,planes,examples,attribution,
+source chronology and OCR boundaries remain explicit and quarantined.
+Source-bound validation and actual review-validatorCLI/module equality pass;
+fresh46 targeted Python tests pass,no implementation/full-suite/Node rerun.
+All301queued/36originals/4imports/6priorOCR and selected production/source/caller/
+config/registry/two-section partition hashes,API PID38899 command/socket preserved;
+hash/process/socket observation only,no live reprobe. All247 prior artifacts checked
+beforedocs;246 unchanged afterward,only authorized RESUME append with old git revision
+retained. All prior partial-worker artifacts,32 partial summaries,132 missing Critters
+references,23 unavailable labels,unresolved references,failures/corrections/originals/
+quarantine,suspicious extraction,correctedBatch13metadata and retained Batch16 original
+plan/actual Movement correction remain. Initial unavailable python/control-display
+limits retained;zero truncated source windows,source repairs or duplicate read credit.
+HEARTBEAT unchanged;parent alone evaluates/removes the exact source-read guard after
+independent verification. No imports/rebuilds/restarts,deployment,promotion,public/
+source-rights expansion,primary reader/routing/config/voice changes,destruction or U5.
+Stop after Batch17;parent verifies/reports. STATE proposes a separate bounded private
+claim-level pilot preparation over two already partial/mixed summary reviews;not
+started here. Retain original conditional18–30active-hour estimate and unfinished
+supporting-passage/full-paraphrase/claim-level paired-answer/eligible-source/integration/
+capture/shadow/voice/live-table/retirement gates. More files read is not project completion.
