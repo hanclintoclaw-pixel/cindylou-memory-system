@@ -135,3 +135,18 @@ those from intrusion countermeasures, a named Humanis worm from the organization
 and a spirit-host table from Matrix mechanics. STATE links source-bound review,
 CLI parity, 32 targeted passing tests and selected preservation receipts. No new
 implementation, full-suite rerun, source admission or reader cutover is implied.
+
+
+The 2026-11-03 resume verified that Batch9 was already complete, then executed
+only STATE.next_action's six different unread candidates as Batch10; see
+`U4-ADJECTIVE-METAPHOR-ATTRIBUTION-REVIEW.md`. Six new whole-file readings took
+18 bounded windows, with six original OCR contexts. Cumulative content review
+is 262/301, with 39 unread, 145 reviewed mixed/unresolved, 184 source tasks and
+556 findings; zero promoted, unique claims unassessed. Five explicitly routed
+aggregates have 243 exact citation-row matches / 250 locations / five ambiguous
+rows; Restore description's 55 original references stay unresolved and unopened.
+Adjectives, metaphors, entertainment, NPC restrictions and explicit falsity
+remain quarantined despite copy equality. Fresh 46 targeted tests pass; no code,
+full-suite or Node rerun is implied. STATE links the new private evidence and
+production/source/process preservation checks; historical Batch9 receipts stay
+retained without duplicate credit. Continue STATE.next_action, not earlier counts.
