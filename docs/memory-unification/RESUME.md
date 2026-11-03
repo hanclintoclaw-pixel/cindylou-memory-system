@@ -240,3 +240,27 @@ primary reader/config/routing/voice/source-rights or U5 change. Keep original co
 integration/capture/shadow/voice/live-table/retirement gates open. STATE links current
 private receipts and exact next_action. Stop after Batch14;parent verifies/reports;
 Batch15 not started.
+
+The next bounded continuation is Batch15;see `U4-ENTITY-AND-COUNTERMEASURE-REVIEW.md`.
+Recovery preserved interrupted-worker artifacts,reused valid plans and gave partial
+reads zero credit. Six unread aggregates fully read in93 contiguous revision-bound
+windows. Cumulative292/301 reviewed,9 unread,175 mixed/unresolved,184 source follow-ups,
+954 findings(123 new),zero promoted,unique claims unassessed;prior286 annotations unchanged.
+Dragon-only trace:288 exact rows/292 locations/one ambiguous row;actual CLI/module parity.
+Five descriptions1900 references unresolved/unopened;zero aliases. Seventeen planned OCR
+contexts,two adjacent continuation windows and eight terminal-blank supplements cover nine
+page intervals;four current Critters comparisons are not old-path aliases/copy proof.
+Subject/form/infection/brand/corporate relation/attribution/adventure contingency/IC token
+contamination/conditional GM premises remain separate and quarantined. Actual review-validator
+CLI/module equality and46 targeted Python tests pass;no implementation/full-suite/Node rerun.
+Postwrite diagnostic KeyError,failed documentation patch and terminal-blank clarification
+retained;no replayed writes,source repair or guessed mapping. Prior32 partial summaries,
+132 missing Critters references,23 unavailable labels,failures/corrections,originals/quarantine,
+suspicious extraction and corrected Batch13 metadata retained. Selected source/production/
+caller/config/registry/pilot hashes,API PID38899 command/socket and generic HEARTBEAT unchanged.
+All188 prior artifacts checked before docs;187 unchanged afterward,only authorized RESUME
+append with prior git revision retained. No live reprobes,imports/rebuilds/restarts,deployment,promotion,
+public/source-rights expansion,primary reader/routing/config/voice or U5 change. Retain original
+conditional18–30 active-hour estimate and all supporting-passage/claim-level paired-answer/
+eligible-source/integration/capture/shadow/voice/live-table/retirement gates. STATE links exact
+private receipts and next_action. Stop after Batch15;parent verifies/reports;Batch16 not started.
