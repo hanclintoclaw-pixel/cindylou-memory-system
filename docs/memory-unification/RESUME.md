@@ -264,3 +264,30 @@ public/source-rights expansion,primary reader/routing/config/voice or U5 change.
 conditional18–30 active-hour estimate and all supporting-passage/claim-level paired-answer/
 eligible-source/integration/capture/shadow/voice/live-table/retirement gates. STATE links exact
 private receipts and next_action. Stop after Batch15;parent verifies/reports;Batch16 not started.
+
+The next bounded continuation is Batch16;see `U4-CONTROL-MODE-AND-POLYSEMY-REVIEW.md`.
+Six descriptions fully read in139 contiguous revision-bound <=80line/6000original-char
+windows. Cumulative298/301 reviewed,3 unread,181 mixed/unresolved,184 source follow-ups,
+1099 findings(145 new),zero promoted,unique claims null;prior292 annotations unchanged.
+All3453 cited references across23 absent legacy targets remain unresolved/unopened;
+no consistent trace subset,tracer/trace-CLI parity,aliases or guessed remapping.
+Seven independent current Critters OCR windows cover four complete page intervals,
+including terminal lines;not legacy-path resolution or historical-copy proof. One
+plan-purpose power label corrected from actual context with original plan/hash retained;
+no source repair or duplicate credit. Biological/social/Matrix host meanings,spell
+currencies,physical/virtual/figurative drones,armor domains and distinct control modes
+remain scoped;examples,signatures,options,offers and adventure branches stay quarantined.
+Actual review-validator CLI/module equality and46 targeted Python tests pass;no
+implementation/full-suite/Node rerun. All301queued/36originals/4imports/6priorOCR,
+selected source/production/caller/config/registry/two-section pilot and API PID38899
+command/socket preserved without live reprobes. All221 prior artifacts checked before
+docs;220 unchanged after authorized RESUME append,old revision retained in git.
+HEARTBEAT unchanged. Prior32 partial summaries,132 missing references,23 unavailable
+labels,interrupted-worker artifacts,failures/corrections,originals/quarantine,suspicious
+extraction and corrected Batch13 metadata remain. STATE binds exact receipts/next_action.
+Next candidates:attack.description.md,deck.description.md,matrix.description.md;verify
+unread state first. No imports/rebuilds/restarts,deployment,promotion,public-source
+expansion,primary reader/routing/config/voice/source-rights or U5 changes. Retain original
+conditional18–30active-hour estimate and all supporting-passage/claim-level paired-answer/
+eligible-source/integration/capture/shadow/voice/live-table/retirement gates. Stop after
+Batch16;parent verifies/reports;Batch17 not started.
