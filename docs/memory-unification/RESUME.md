@@ -190,7 +190,7 @@ Stop after this batch and continue only STATE.next_action next invocation.
 
 
 The next bounded continuation is Batch13; see
-`U 4-CONDITIONAL-AND-SUBJECT-REVIEW.md`. Six new whole-file readings took 40
+`U4-CONDITIONAL-AND-SUBJECT-REVIEW.md`. Six new whole-file readings took 40
 revision-bound contiguous windows; 10 original OCR contexts, 8 additional tails and 4
 supplemental heading/continuation windows were actually read. Current cumulative
 review: 280/301, 21 unread, 163 reviewed mixed/unresolved, 184 source follow-ups,
@@ -212,5 +212,31 @@ supplement metadata retained privately. HEARTBEAT unchanged. STATE links exact
 private receipts and next_action. Retain original conditional 18–30 active-hour
 estimate and unfinished supporting-passage/paired-answer/eligible-source/primary-reader/
 capture/shadow/voice/live-table/retirement gates. No imports/rebuilds/restarts,
-promotions, public expansion, routing/config/voice/source-rights or U 5 changes.
+promotions, public expansion, routing/config/voice/source-rights or U5 changes.
 Stop after Batch 13; parent verifies/reports; Batch 14 not started.
+
+
+The next bounded continuation is Batch14; see `U4-METATYPE-AND-IDENTITY-REVIEW.md`.
+Six description aggregates were fully read in56 revision-bound contiguous windows.
+Current cumulative review:286/301 files,15 unread,169 reviewed mixed/unresolved,
+184 source follow-ups,831 findings(92 new),zero promoted,unique claims unassessed.
+Explicit-route preflight found no consistent file subset:all1330 embedded references
+remain unresolved/unopened;no tracing,CLI/module trace-parity or aliases claimed.
+Four independently selected current Critters OCR-page comparisons were actually read
+in nine substantive windows plus four terminal-blank supplements. They distinguish
+infected subjects,predator/prey size,and resemblance;they do not resolve old paths,
+prove historical copies,or admit rules. Failed comparison-plan paths and coverage
+clarification remain privately evidenced. Metatypes,individuals,personae,avatars,
+brands,metaphor,cultural chronology and conditional adventure outcomes stay separate.
+Actual review-validator CLI/module equality and46 targeted Python tests pass;no
+implementation/full-suite/Node rerun. Prior280 annotations,32 partial summaries,
+132 missing Critters references,23 unavailable labels,prior failures/originals/quarantine,
+suspicious extraction and corrected Batch13 adjacent-page metadata remain retained.
+All selected queued/original/import/OCR/prior-artifact/production/caller/config/pilot
+fingerprints and API PID38899 command/socket preserved without live reprobes.
+HEARTBEAT unchanged;no import/rebuild/restart,deployment,promotion,public expansion,
+primary reader/config/routing/voice/source-rights or U5 change. Keep original conditional
+18–30 active-hour estimate and all supporting-passage/paired-answer/eligible-source/
+integration/capture/shadow/voice/live-table/retirement gates open. STATE links current
+private receipts and exact next_action. Stop after Batch14;parent verifies/reports;
+Batch15 not started.
