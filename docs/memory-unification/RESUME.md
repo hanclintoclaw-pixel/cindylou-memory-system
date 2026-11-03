@@ -150,3 +150,19 @@ remain quarantined despite copy equality. Fresh 46 targeted tests pass; no code,
 full-suite or Node rerun is implied. STATE links the new private evidence and
 production/source/process preservation checks; historical Batch9 receipts stay
 retained without duplicate credit. Continue STATE.next_action, not earlier counts.
+
+
+The next bounded continuation is Batch11; see
+`U4-POLYSEMY-AND-SCENARIO-REVIEW.md`. Six new whole-file readings took 22
+revision-bound windows, with eight OCR contexts plus five page-tail windows.
+Current cumulative review: 268/301, 33 unread, 151 reviewed mixed/unresolved,
+184 source follow-ups, 610 findings; zero promoted, unique claims unassessed.
+Four explicitly routed aggregates yield 279 exact citation rows / 281 locations /
+two ambiguous rows, with actual CLI/module parity. The two descriptions retain
+148 unresolved unopened references. Polysemy, infected/variant subjects, fictional
+listings, contested testimony, rumored holdings, forecasts and GM scenario premises
+stay distinct and quarantined. Fresh 46 targeted Python checks pass; no full-suite
+or Node rerun. STATE links current receipts and exact next_action. Preserve all
+prior failures/originals/quarantine, 32 partial summaries, 132 unresolved Critters
+references, 23 unavailable labels, selected production fingerprints, active API
+identity/socket and two-section pilot. No live reprobes or deployment changes.
