@@ -187,3 +187,30 @@ caller/config/pilot inputs and API identity/socket are preserved without live
 reprobes. HEARTBEAT stays unchanged. No deployment/routing/voice/source-rights,
 import/rebuild, promotion or U5 change; retain prior estimate and open gates.
 Stop after this batch and continue only STATE.next_action next invocation.
+
+
+The next bounded continuation is Batch13; see
+`U 4-CONDITIONAL-AND-SUBJECT-REVIEW.md`. Six new whole-file readings took 40
+revision-bound contiguous windows; 10 original OCR contexts, 8 additional tails and 4
+supplemental heading/continuation windows were actually read. Current cumulative
+review: 280/301, 21 unread, 163 reviewed mixed/unresolved, 184 source follow-ups,
+739 findings (69 new), zero promoted, unique claims unassessed. Only Spell passed
+explicit-route preflight: 142 exact rows/145 locations/two ambiguous rows, with actual
+CLI/module parity. Five descriptions retain 776 unresolved unopened references;
+zero aliases admitted. Ordinary spelling, figurative language, signatures, animal
+subjects, character-building currencies, sport-specific restrictions and conditional
+GM material remain distinct from general mechanics; corporate disguise, historical
+ownership, names, product brands, allegations and scenarios stay attributed.
+Suspicious OCR expansion stays unverified; copy equality is not rules/edition/page,
+PDF-image, claim/canon/disclosure/retrieval clearance. Fresh 46 targeted Python tests
+pass; no implementation/full-suite/Node rerun. All prior 274 annotations, 32 partial
+summaries, 132 missing Critters references, 23 unavailable labels,prior failures,
+originals and quarantine retained. Selected sources/production/caller/config/pilot
+fingerprints, 141 prior artifact hashes and API PID 38899 command/socket preserved
+without live reprobes. Read-only unavailable-rg failure and corrected adjacent-page
+supplement metadata retained privately. HEARTBEAT unchanged. STATE links exact
+private receipts and next_action. Retain original conditional 18–30 active-hour
+estimate and unfinished supporting-passage/paired-answer/eligible-source/primary-reader/
+capture/shadow/voice/live-table/retirement gates. No imports/rebuilds/restarts,
+promotions, public expansion, routing/config/voice/source-rights or U 5 changes.
+Stop after Batch 13; parent verifies/reports; Batch 14 not started.
