@@ -166,3 +166,24 @@ or Node rerun. STATE links current receipts and exact next_action. Preserve all
 prior failures/originals/quarantine, 32 partial summaries, 132 unresolved Critters
 references, 23 unavailable labels, selected production fingerprints, active API
 identity/socket and two-section pilot. No live reprobes or deployment changes.
+
+
+The next bounded continuation is Batch12; see `U4-ROLE-AND-HARDWARE-REVIEW.md`.
+Six new whole-file readings took 33 revision-bound windows, with eight original
+OCR contexts and four additional tails. Current cumulative review: 274/301,
+27 unread, 157 reviewed mixed/unresolved, 184 source follow-ups, 670 findings;
+zero promoted, unique claims unassessed. Only Deck passed the explicit-route
+preflight for tracing: 120 exact rows, 123 matching locations, two ambiguous
+rows, with actual CLI/module parity. Five descriptions retain 629 unresolved
+unopened references. Subject/role distinctions include signatures, metaphor,
+nautical language, conditional creature effects, ordinary proficiency and
+historical brands versus current ownership; copy equality does not clear them.
+46 targeted Python tests pass; no implementation/full-suite/Node rerun. STATE
+links private source-bound coverage, annotations, validation, context, preflight,
+CLI, tests, failure and selected preservation receipts. Earlier attestations,
+32 partial summaries, 132 missing Critters references, 23 unavailable labels,
+originals, quarantine and prior failures remain. Production fingerprints, selected
+caller/config/pilot inputs and API identity/socket are preserved without live
+reprobes. HEARTBEAT stays unchanged. No deployment/routing/voice/source-rights,
+import/rebuild, promotion or U5 change; retain prior estimate and open gates.
+Stop after this batch and continue only STATE.next_action next invocation.
