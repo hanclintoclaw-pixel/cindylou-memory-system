@@ -576,3 +576,30 @@ restart/deploy/rights/promotion/primaryreader/routing/config/voice/destruction/U
 Stop25forparentverification,nochainedimplementation. Future project work remains
 openai/gpt-6.1-sol thinking medium; historical STATE.thinking high is not current
 packet effort. Broader gates unfinished; historical conditional18–30hoursnotnewETA.
+
+
+One bounded Sol/medium packet26 code-only feasibility refinement is documented in
+`U4-HOST-FEASIBILITY-REFINEMENT.md`. CLOSED design unknowns: actual admitted attempt
+resolver/handoff/finally ownership located; generation facts are observers/checks,
+not atomic effect fences; real loader instance/registration custody and bundled
+shared versus non-bundled captured identity branches located. Bundled export
+identity mismatch warns but returns code; plugin-owned digest excludes dependency
+owners. Host-owned scratch seam is attainable; supported external private lease
+acquisition remains unsupported. OPEN execution gates: actual host integration,
+owner-mediated atomic commits, active load/dependency/build provenance, compatible
+fork/thread containment, all productionwrite denial and whole-resource settlement.
+Both real lanes unavailable. No patch/install/execution or quality/cutover claim.
+Next only after parent review: one fixture-only default-off local custody prototype
+with fake admitted context/provider/loader,owned/borrowed release,settlement ordering,
+synchronous scratch effect turnstile and four deterministic controls specified in
+report;no IPC/host installation/real readers/nativeworkers/productionDB/builds.
+19privateunresolvedcases/twoorigingroups,301/301read,0unread,184mixedtasks,1206findings,
+0promoted,uniqueclaimsnull,32partialmixedsummaries unchanged. Selected preservation,
+exact bounded code revision checks and doc/git checks only;no suites/hostcontrols/
+reader/providerimports,private sessions/rawtranscripts,model/HTTP/tool/liveprobes,
+retrieval/get/pairedanswer/quality/loss/publicparity/latency. Prior receipts/failures/
+originals/import/OCR/quarantine and production11dirty/caller/config/registry/pilot/
+API38899command/socket preserved;RESUMEappendonly. Parent ownsHEARTBEAT/notifier,
+neithereditednorattestedunchanged. No rebuild/restart/deploy/import/rights/promotion/
+primaryreader/routing/config/voice/destruction/U5. Stop26forparentreview,nochain;
+futureSol/medium,historicalconditional18-30hoursnotnewETA;broadergatesunfinished.
