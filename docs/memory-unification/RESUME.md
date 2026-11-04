@@ -476,3 +476,32 @@ bounded engineering gate is platform-enforced synthetic-child confinement/descen
 supervision against synthetic protected targets only,notreaderexecution. Realprivate
 authority,compiledworkeridentity,productionwritedenialandallbroadergatesremainunproven;
 historicalconditional18–30hour estimate unchanged,notnewETA.
+
+
+One bounded packet23 is documented in `U4-SYNTHETIC-CONFINEMENT.md`.
+Fixed synthetic-only Darwin sandbox child/opt-in CLI implemented; actual scratch
+positive succeeds and eleven adversarial synthetic protected-write/fork/detached
+spawn controls return EPERM. Protected bytes/size/mtime/mode/inode/directory retained;
+second fixed sleeping child deadline-killed and reaped before final protection check.
+This is kernel prevention of descendant creation, not arbitrary descendant tracking:
+the fork-denying profile cannot admit the native worker stack. Default reads/system
+IPC remain allowed; configured network denial is not a tested network-isolation proof.
+All non-synthetic/default-off/unsupported/failed-proof lanes remain unavailable; no
+arbitrary commands, production targets, real readers or unsandboxed fallback.
+Twelve targeted tests and actual default-off/opt-in CLI pass. Three new source
+hash/size/mtime identities frozen before final tests/controls and unchanged after;
+45 prior native and three prior harness bindings retained, not compiled equivalence.
+Nineteen private unresolved cases/two origin groups remain unchanged/unavailable;
+eligible passage not run, correctness unassessed, loss unknown.346 prior artifacts,
+selected queued/original/import/OCR/production11dirty/caller/config/two-sectionpilot/
+API38899command/socket preserved;only append-onlyRESUME exception. Initial platform
+success receipt retained separately;no historical failure/receipt overwritten.
+301/301read,0unread,184mixedtasks,1206findings,0promoted,uniqueclaimsnull and32partialmixed
+summaries unchanged. No realreader/provider/model/HTTP/tool/productionDB execution,
+fullPython/Node suites,rebuild/restart/deploy/rights/promotion/primaryreader/routing/
+config/voice/destruction/U5. ParentHEARTBEAT/notifier neithereditednorattestedunchanged.
+Stop for parent verification;next one bounded code-only actual host-authority and
+emitted-provider/worker identity feasibility packet may prepare remaining gates,
+not execute readers. Productionwrite-denial,fork-compatible containment,real authority,
+compiled identities and broader retrieval/integration/capture/shadow/voice/live-table/
+retirement gates remain incomplete. Historicalconditional18–30hour estimate notnewETA.
