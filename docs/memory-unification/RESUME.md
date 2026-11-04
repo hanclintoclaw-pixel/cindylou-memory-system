@@ -377,3 +377,36 @@ Original conditional18–30active-hour estimate and unfinished broader gates ret
 Stop for parent verification. Next separate bounded action: audit actual legacy/
 unified reader transitive write surfaces and prepare isolated source-generation-
 bound paired evaluation for these candidates; do not execute readers in this packet.
+
+
+One bounded code-only audit20/preparation packet is now documented in
+`U4-READER-WRITE-AUDIT-AND-PAIRED-DESIGN.md`. Actual legacy/shared/canary service
+entrypoints were traced without importing or executing readers. Identified sinks
+include equipment cache temp/replace and default SQLite connections, shared capture
+constructor/search/history reconciliation and inventory publication, native manager
+DB acquisition/search-time repair/background sync, host tool recall keyed-store/
+origin/event writes, and explicit rebuild/source-generation routes. The native
+transitive DB/worker/host-keyed-store/embedding dependency closure is incomplete;
+no claim of exhaustive audit or read-only execution clearance. Disabling onSearch
+alone is insufficient. No historical write inferred from a possible path.
+Nineteen unchanged CP18/CP19 candidate queries/rubrics and source/passages are bound
+privately to two shared origin groups. Design separates candidate retrieval,
+eligible bounded passage and final correctness, policy/ranking/ingestion/unknown,
+no-fact doc-ID negative and before/after generation drift; these harness controls
+are specified, not implemented/executed. Current public-only canary cannot serve
+private candidates; private caller-bound adapter remains unavailable, with no legacy
+root/operator/session-authority substitution. No paired answers, eligible gets,
+correctness/loss/public-eligibility/latency or full Python/Node tests run.
+Data-only19case binding/status/query/rubric checks and44code-file hash/mtime checks
+pass.295priorartifact paths plus selected source/production11dirty/caller/config/
+registry/two-sectionpilot/API PID38899command/socket preservation checked; old
+RESUME retained in git with append-only change. Code44baseline was captured after
+inspection/beforepacket, not retroactive start proof. Parent owns HEARTBEAT/notifier;
+worker did not edit or attest those unchanged. Prior failures/corrections/originals/
+quarantine/19savednegatives/32partialmixedsummaries retained;301/301read,0unread,
+184mixedtasks,1206findings,0promoted,uniqueclaims null unchanged. NoHTTP/tool/live
+probes,imports/reimports,rebuilds,restarts/deployment,public-source-rights expansion,
+promotion,primary reader/routing/config/voice changes,destruction or U5. Original
+conditional18–30active-hour estimate remains historical conditional, not a new ETA.
+All broader gates remain. Stop audit20 for parent verification; next separate gate
+is bounded code-only native write-surface closure, not reader execution.
