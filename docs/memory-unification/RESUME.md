@@ -447,3 +447,32 @@ U5. Historical conditional18-30activehour estimate unchanged;allbroader gates un
 Stop audit21forparentverification;next separately bounded default-off isolation harness
 implementation/scratch controls may proceed with private/native lanes unavailable until
 actual authority/isolation/dependency gates hold;no chained execution here.
+
+
+One bounded default-off implementation packet22 is documented in
+`U4-ISOLATION-HARNESS.md`. New standard-library-only scaffolding has no real-reader
+dispatch: private/native/legacy/model/HTTP/tool lanes stay unavailable, before supplied
+input access or reader imports/processes. Cooperative scratch-only immutable JSON output
+guards, byte+mtime generation checks, same-query/context two-phase controls and revocable
+local test tokens are implemented; none is an OS sandbox, host authority or production
+write-denial proof. Synthetic positive bounded-passage and ID-without-fact negative
+controls pass through the actual opt-in CLI on the private data volume. The pinned
+nineteen CP18/CP19 private cases and all packet/source hashes are consumed unchanged,
+with both real readers unavailable, eligible passage not run, correctness unassessed,
+loss unknown;twoorigin groups are not nineteen unique facts.20targeted unit tests pass;
+initial19-test instrumentation failure retained,corrected guard permits stdlib argparse
+while rejecting reader imports/processes. New3Python files bound before/after final
+tests/controls;45priornative hashes/mtimes unchanged,notcompiledidentityproof.317prior
+artifacts,301queuedsources/originals/import/OCR/selectedproduction11dirty/caller/config/
+registry/two-sectionpilot/API38899command/socket preserved;only append-onlyRESUME
+exception,oldbytes retained in git. No real reader/model/HTTP/tool execution,production
+DB opens,retrieval/eligibleget/pairedanswer/latency/publiceligibility/loss/fullPython/Node
+run. Prior receipts/failures/originals/quarantine and32partialmixedsummaries retained;
+301/301read,0unread,184mixedtasks,1206findings,0promoted,uniqueclaimsnull unchanged.
+Historical7957receipt retained,notrerun. Parent ownsHEARTBEAT/notifier,neithereditednor
+attestedunchanged. No imports/reimports,rebuild/restart/deploy,rights expansion,promotion,
+primaryreader/routing/config/voice/destruction/U5. Stopforparentverification;next separate
+bounded engineering gate is platform-enforced synthetic-child confinement/descendant
+supervision against synthetic protected targets only,notreaderexecution. Realprivate
+authority,compiledworkeridentity,productionwritedenialandallbroadergatesremainunproven;
+historicalconditional18–30hour estimate unchanged,notnewETA.
