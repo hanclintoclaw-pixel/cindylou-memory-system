@@ -678,3 +678,28 @@ confinement,whole settlement,productionwrite denial remain open;both real reader
 lanes unavailable. Declaration-enabled gate also remains open;future attempt must
 retain timeout and use justified deadline/resources and same-environment comparison.
 Counts/cases unchanged;parent HEARTBEAT/notifier untouched;Sol/Medium,no new ETA.
+
+
+Packet31 stages an additive default-off admission-custody scaffold, NOT a usable
+reader executor or completed host integration. See U4-INVOCATION-EXECUTOR-CANDIDATE.md
+and integration-candidates/packet31/. All48 Packet30 closure bindings verified;
+before authority/resume/daily bytes retained.23/23 closed-VM synthetic controls pass;
+shipped default-off runs unchanged;enabled path uses one explicit VM-only literal
+substitution. Two broken variants fail intended controls (1 and2 failures). Fresh
+canonical standard core baseline/candidate pass empty logs in same reused scratch
+environment;606compiler files/two generated declarations/stamp/link targets match
+Packet30.22log hashes checked;all3patches reversed;selected host source unchanged.
+Other dependency contents not frozen;no declaration retry/acceptance/build proof.
+All reads unavailable before request access;no provider acquisition or fallback path.
+Exact admitted/audience pairing at actual attempt lifetime is NOT implemented,
+though separate object/currency checks and opaque local custody are implemented.
+No actual dispatch hook,public mint,wire parser,effect commit,identity/confinement/
+worker settlement gate is cleared. Same-owner review,not independent-agent review.
+Next bounded step: source-bound uninstalled binder inside corrected dispatch custody,
+pairing exact resolver-returned audience with original admitted context;invalidate
+before resolver release. Complete-dispatch synthetic controls must reject crossed
+valid pairs and cover setup/revoke/borrowed/cleanup faults. Keep reads unavailable;
+no real providers/host installation/config/routing/voice/U5 or rights/promotion.
+All actual integration/effect-owner/active identity/confinement/whole settlement/
+productionwrite-denial gates and declaration gate remain open;both real lanes
+unavailable. Counts/cases unchanged;HEARTBEAT/notifier untouched;Sol/Medium,no ETA.
