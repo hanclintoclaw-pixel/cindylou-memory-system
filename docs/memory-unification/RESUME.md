@@ -350,3 +350,30 @@ rebuilds/restarts/deployment/promotion/public-source expansion/primary reader-ro
 config-voice/destruction/U5. Original conditional18–30active-hour estimate and all
 unfinished broader gates remain. Stop after this pilot for parent verification;
 no remainder batch or paired harness started.
+
+One subsequent bounded private remainder packet is now prepared; see
+`U4-CLAIM-REMAINDER-PREPARATION.md`. Nine new review units address all three
+preceding remainder families (two era/scene, two aggregate actor/time, five
+outcome/actor/causality); the ten prior candidates and all prior receipts remain
+unchanged. Overlapping spans isolate questions, not unique facts. Both full
+paraphrases and both extracted originals were freshly read in seven contiguous
+revision-bound <=80line/6000original-character windows, with no filename chronology
+or new PDF-image verification. Every unit remains private/provisional/unresolved/
+not promoted; decomposition is not semantic clearance or exhaustive original-fact
+coverage. All32 summaries stay partial/mixed. Source totals remain301/301 read,
+0unread,184mixed/unresolved tasks,1206findings,0promoted,unique claims null.
+Positive binding/status/retention validation and19scratch negatives pass; no
+real readers,paired answers,eligible gets,correctness/loss/public-eligibility/
+latency measurements or full Python/Node reruns. Start preservation covers282
+prior artifact paths and selected source/production/caller/config/pilot/API
+identity/socket surfaces. Retained7957-file runtime inventory revalidated after
+packet preparation and after commit; timing/scope explicit. Prior annotations/
+failures/corrections/partial-worker artifacts/originals/quarantine/reference limits
+retained. Only2sanitized docs committed; old RESUME bytes retained in git. Parent
+owns HEARTBEAT/notifier; worker did not edit or attest them unchanged. NoHTTP/tool/
+live probes,imports/reimports,rebuilds,restarts,deployment,promotion,public/source-
+rights expansion,primary reader/routing/config/voice changes,destruction or U5.
+Original conditional18–30active-hour estimate and unfinished broader gates retained.
+Stop for parent verification. Next separate bounded action: audit actual legacy/
+unified reader transitive write surfaces and prepare isolated source-generation-
+bound paired evaluation for these candidates; do not execute readers in this packet.
