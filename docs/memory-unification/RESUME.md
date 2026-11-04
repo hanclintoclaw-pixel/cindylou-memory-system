@@ -410,3 +410,40 @@ promotion,primary reader/routing/config/voice changes,destruction or U5. Origina
 conditional18–30active-hour estimate remains historical conditional, not a new ETA.
 All broader gates remain. Stop audit20 for parent verification; next separate gate
 is bounded code-only native write-surface closure, not reader execution.
+
+
+One bounded code-only audit21 packet closes concrete native persistence edges; see
+`U4-NATIVE-PERSISTENCE-CLOSURE.md`. Dreaming recall/meta and host event/cursor writes
+reach shared `state/openclaw.sqlite` plugin_state_entries via admitted async worker
+transactions; event retention/expiry evicts rows. Legacy events.jsonl is discovery-only.
+Origin lineage reaches per-agent openclaw-agent.sqlite/memory_entry_origins through
+admitted schema/record/delete worker transactions. Non-status published manager open
+admits schema through publication worker; schema/migration/revision triggers, staged
+SQLite temp rows, source/chunk/vector replacement/deletion, embedding-cache retention
+and released shadow cleanup are mutation routes. Missing search identity can sync even
+with ordinary onSearch disabled; background sync can outlive search return. Retrieval
+worker and readOnly/query_only KNN child are only local edges,not whole-stack clearance.
+Source HEAD pinned4d94a9f;45targeted source files bound by content/size/mtime after
+inspection/beforepacket,not retroactive start proof or emitted-worker equivalence.
+Generic host state/agent lifecycle/schema/WAL/admission/lease/quarantine,compiled package
+resolution,native SQLite/extensions,embedding/worker/PDF dependencies remain bounded
+unknowns;no exhaustive closure or real-reader execution clearance. Existing19private
+unresolved cases/twoorigin groups unchanged;private caller-bound adapter unavailable.
+Design adds both shared/agent DB+sidecar,temp/registry/lock/cache/log write-denial and
+post-descendant-settlement generation requirements;not implemented or tested guards.
+Data-only19query/rubric/status retention assertions and45codehash/mtime comparisons
+pass;311priorartifactpaths plus selected queued/original/import/OCR/source/production
+11dirty/caller/config/registry/two-sectionpilot/API PID38899command/socket preserved,
+except authorized RESUMEappend retaining oldbytes in git. Historical7957inventory
+receipts retained,not freshly rerun. No reader imports/execution,HTTP/tool/liveprobes,
+paired answers,eligible gets,correctness/loss/publiceligibility/latency,harnesscontrols,
+unit/fullPython/Node run. Parent owns HEARTBEAT/notifier,worker neither edits nor attests
+unchanged;old audit20receipts untouched. New manifest carries truthful unchanged source
+progress only for existing observer schema. Prior failures/corrections/originals/
+quarantine/reference limits retained;all32summaries partialmixed;301/301read,0unread,
+184mixedtasks,1206findings,0promoted,uniqueclaims null. No imports/reimports,rebuild/
+restart/deploy,rights expansion,promotion,primaryreader/routing/config/voice/destruction/
+U5. Historical conditional18-30activehour estimate unchanged;allbroader gates unfinished.
+Stop audit21forparentverification;next separately bounded default-off isolation harness
+implementation/scratch controls may proceed with private/native lanes unavailable until
+actual authority/isolation/dependency gates hold;no chained execution here.
