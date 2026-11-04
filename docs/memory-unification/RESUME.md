@@ -505,3 +505,47 @@ emitted-provider/worker identity feasibility packet may prepare remaining gates,
 not execute readers. Productionwrite-denial,fork-compatible containment,real authority,
 compiled identities and broader retrieval/integration/capture/shadow/voice/live-table/
 retirement gates remain incomplete. Historicalconditional18–30hour estimate notnewETA.
+
+
+## Operator model directive — 2026-11-04
+
+JackalMoreau requests **Sol (Medium), not High**, for the memory-system
+reconciliation/replacement (memory-unification) project from this point forward.
+Use `openai/gpt-6.1-sol` with `thinking: "medium"` for future project work,
+including project subagents, scheduled continuations, and durable project artifacts.
+This project-specific instruction supersedes earlier Sol/high project instructions
+and the general High-effort artifact guidance. Do not automatically raise effort
+to High. Historical packet settings remain historical; this does not claim to
+change an already-running worker's effort.
+Source: JackalMoreau, Discord request `1567530983127912470`, thread
+`1567378826403643432`, 2026-11-04.
+
+
+One bounded Sol/medium code-only packet24 is documented in
+`U4-HOST-AUTHORITY-AND-WORKER-IDENTITY.md`. Installed host audience objects are
+in-process minted capabilities bound to invocation and session-generation lineage;
+public SDK provider registration is not supported external lease acquisition.
+Gateway memory RPC captures operator authority, not a substitute private grant.
+Inspected Memory Core registers legacy runtime, not providerRuntime; active loaded
+slot owner is unobserved. Static emitted descriptors resolve canonical worker
+wrappers/root chunks, including separate KNN dependencies;57selected code/doc/emitted
+hash-size-mtime bindings are not source-build equivalence or exhaustive closure.
+Ordinary Worker threads and retained native supervisor/broker paths need distinct
+settlement. External private harness authority/IPC, active loader-bound identity,
+transitive build/native identity and fork/thread-compatible production confinement
+remain unproven;real readers unavailable. No reader/provider import or execution,
+private sessions/raw transcripts,model/HTTP/tool/liveprobes,productionDB opens/builds,
+unit/fullPython/Node or retrieval/answer/quality/loss/latency measurements.
+19privateunresolvedcases/twoorigingroups retain statuses;301/301read,0unread,
+184mixedtasks,1206findings,0promoted,uniqueclaimsnull,32partialmixedsummaries unchanged.
+348priorartifact paths and selectedsource/production11dirty/caller/config/registry/
+two-sectionpilot/API38899command/socket preservation pass except authorized append-only
+RESUME;pre-existing Sol/medium directive retained verbatim. Partial packet24 receipts,
+failures/originals/quarantine retained;new bindings afterinspection,not retroactive
+startproof. ParentHEARTBEAT/notifier neithereditednorattestedunchanged. No import/
+rebuild/restart/deploy/rights/promotion/primaryreader/routing/config/voice/destruction/U5.
+Next separately bounded code-only host integration patch DESIGN:host-owned invocation
+executor,revocation-preserving IPC contract and loader-bound identity receipt/validator,
+with scratch-control specifications only,not installation or real execution. Stop
+packet24forparentverification,nochain. All broader gates remain incomplete;historical
+conditional18–30activehour estimate is notnewETA. Future project work stays Sol/medium.
