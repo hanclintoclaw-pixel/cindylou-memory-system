@@ -703,3 +703,30 @@ no real providers/host installation/config/routing/voice/U5 or rights/promotion.
 All actual integration/effect-owner/active identity/confinement/whole settlement/
 productionwrite-denial gates and declaration gate remain open;both real lanes
 unavailable. Counts/cases unchanged;HEARTBEAT/notifier untouched;Sol/Medium,no ETA.
+
+
+Packet32 adds the source-bound default-off uninstalled attempt-memory binder; see
+U4-ATTEMPT-MEMORY-BINDING.md and integration-candidates/packet32/. Exact original
+admitted context/resolver-returned audience enter a private WeakMap-backed lifetime
+record inside corrected dispatch custody. Inner finally invalidates before controls
+close/resolver release, including setup/cleanup faults and borrowed no-op release.
+No backend forwarding/executor consumption/provider path. Shipped literal false
+ignores captured pair; enabled controls change one asserted literal only in VM.
+Final38/38 synthetic controls pass (16enabled/15disabled/7rejection); broken pair/
+retention variants fail5/15 intended assertion controls. Initial executed test/source
+and all receipts retained; strengthened current-audience mocks fully rerun, same
+candidate/compiler source. Fresh canonical core baseline/candidate exit0 empty logs;
+46log hashes plus initial supplement receipt verified;3scratch patches reversed;
+selected installed source unchanged.40prior closure bindings preserved with immutable
+before snapshots;no new source/claim credit or independent-agent acceptance.
+The binder does not yet capture attempt abort signal; inherited abort-error test is
+NOT signal-revocation proof. Next: one bounded Sol/Medium uninstalled private handle
+handoff/consumption into Packet31 executor, binding caller/admitted/audience/signal
+and invalidating before release; closed complete-dispatch and request-poison controls,
+negative crossed/expired/aborted handles. All reads must still refuse before request
+access. No real readers/providers/install/DB/build/probes/config/routing/voice/U5,
+rights/promotion/retirement/rebuild. Actual authority integration, participating
+atomic effect protocol, active dependency/build identity, compatible confinement,
+whole resource settlement, production-write denial, declaration acceptance and
+independent corrected-candidate review remain OPEN. Both real lanes unavailable;
+counts/cases unchanged;parent HEARTBEAT/notifier untouched;no ETA.
