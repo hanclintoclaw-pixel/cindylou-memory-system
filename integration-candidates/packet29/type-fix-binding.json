@@ -1,0 +1,5 @@
+{
+  "parent_candidate_sha256": "10eb1374e16ee670e6307fca31b24ca83a3580d23df454c7d72a20dee7dda525",
+  "corrected_candidate_sha256": "c70b2dd250e9df32355c6984ea4d693494c6f3d422a147626263515685c58ab0",
+  "scope": "retain validated local admitted context through callback; no cast/widening/new authority"
+}

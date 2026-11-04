@@ -634,3 +634,22 @@ mock tests; never apply/build in the running host. Real executor/effect-owner at
 protocol/active identity/confinement/whole settlement/production write-denial remain
 open;both real lanes unavailable. No production reader/config/voice/cutover/U5 change,
 no claim promotion or new quality/loss/latency/source-review credit. Sol/Medium.
+
+
+Packet29 validates the isolated cleanup insertion and adds a two-line type fix;
+see `U4-HOST-DISPATCH-VALIDATION.md` and `integration-candidates/packet29/`.
+Packet28 original patch/receipts retained;15closure hashes matched before updates.
+Fourteen corrected actual-dispatch controls pass using closed synthetic imports;
+original code fails seven cleanup controls. The fix retains the existing validated
+admitted-context local in the callback, without type widening or new authority.
+Full core source-config check:607 baseline-equivalent declaration diagnostics,
+zero added/removed normalized lines;NOT a passing full gate. Supplemental semantic
+core check with declaration=false passes;not a substitute. Both patches reversed
+to original scratch bytes;installed host target and selected declaration sources
+unchanged. First premature compiler attempt/incomplete environment/uncorrected
+errors retained. Next: isolate the full-config declaration failures with checkout-
+local static dependencies and canonical compiler entrypoint;review corrected
+candidate before new integration. No host installation/reader execution/production
+DB/build/restart/deploy/config/routing/voice/U5 or promotion;all real authority,
+effect-owner,active identity,confinement,settlement,write-denial gates remain open.
+Counts/cases unchanged;private evidence stays private. Sol/Medium;no new ETA.

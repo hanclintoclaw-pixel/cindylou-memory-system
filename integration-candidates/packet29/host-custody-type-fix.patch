@@ -1,0 +1,20 @@
+--- a/src/agents/embedded-agent-runner/run/run-attempt-dispatch.ts
++++ b/src/agents/embedded-agent-runner/run/run-attempt-dispatch.ts
+@@ -400,7 +400,7 @@
+         },
+         pluginRuntimeRefreshMessages: params.pluginRuntimeRefreshMessages,
+         permissionChange: input.permissionChange,
+-        admittedRunContext: params.admittedRunContext,
++        admittedRunContext,
+         startedAtMs: runInput.startedAtMs,
+         contextEngineAgentId: runInput.contextEngineAgentId,
+         ...(runtime.pluginHarnessOwnsTransport ? { sandbox: pluginSandbox } : {}),
+@@ -543,7 +543,7 @@
+               agentHarnessCompletionScope: createAgentHarnessCompletionScope({
+                 requesterSessionKey: params.sessionKey,
+                 requesterAgentId: workspaceResolution.agentId,
+-                gatewayContextResolver: getGatewayContextResolver(params.admittedRunContext),
++                gatewayContextResolver: getGatewayContextResolver(admittedRunContext),
+               }),
+             }
+           : {}),
