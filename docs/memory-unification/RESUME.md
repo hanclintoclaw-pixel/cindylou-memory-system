@@ -549,3 +549,30 @@ executor,revocation-preserving IPC contract and loader-bound identity receipt/va
 with scratch-control specifications only,not installation or real execution. Stop
 packet24forparentverification,nochain. All broader gates remain incomplete;historical
 conditional18–30activehour estimate is notnewETA. Future project work stays Sol/medium.
+
+
+One bounded Sol/medium packet25 design is documented in
+`U4-HOST-INTEGRATION-PATCH-DESIGN.md`. This is a reviewable host-private,
+version-coupled hook/schema/lifecycle/race/identity/containment design, not an
+installed or executed patch and not a supported external acquisition API.
+Public extensions use only documented `openclaw/plugin-sdk/*`; no private imports,
+operator/session-key/legacy-root substitute or native-to-legacy fallback. Host keeps
+actual admitted context/leases and bound IPC custody; result rejection is separate
+from pre-effect currency and kernel write denial. Atomic effect fences, active
+loader/build/dependency identity and fork/thread-compatible containment/complete
+settlement remain unproven; real lanes unavailable. C01–C28 are exact future scratch
+control specifications only, none executed. Five bounded source hook windows and
+57 inherited static bindings do not establish active load or source-build equivalence.
+Selected preservation and static documentation checks saved privately; no source
+review credit, retrieval/get/paired-answer/quality/loss/public-parity/latency claim.
+19privateunresolvedcases/twoorigingroups,301/301read,0unread,184mixedtasks,1206findings,
+0promoted,uniqueclaimsnull,32partialmixedsummaries retained. Prior receipts/failures/
+originals/import/OCR/quarantine and selected production11dirty/caller/config/registry/
+two-sectionpilot/API38899command/socket preserved by hash/process observations.
+Parent exclusively owns HEARTBEAT/notifier,neithereditednorattestedunchanged.
+No realreader/providerimport/execution,private sessions/raw transcripts,model/HTTP/
+tool/liveprobes,productionDBopens/builds,unit/fullPython/Node tests,install/rebuild/
+restart/deploy/rights/promotion/primaryreader/routing/config/voice/destruction/U5.
+Stop25forparentverification,nochainedimplementation. Future project work remains
+openai/gpt-6.1-sol thinking medium; historical STATE.thinking high is not current
+packet effort. Broader gates unfinished; historical conditional18–30hoursnotnewETA.
