@@ -324,3 +324,29 @@ claim-level pilot preparation over two already partial/mixed summary reviews;not
 started here. Retain original conditional18–30active-hour estimate and unfinished
 supporting-passage/full-paraphrase/claim-level paired-answer/eligible-source/integration/
 capture/shadow/voice/live-table/retirement gates. More files read is not project completion.
+
+The next separate invocation prepares one private nonpromoting claim pilot; see
+`U4-CLAIM-PILOT-PREPARATION.md`. Ten candidate units from two existing partial/mixed
+summaries (six/four) have exact summary spans, original passage bindings, shared
+evidence groups, future question/answer criteria and explicit limits. Both complete
+paraphrases and both extracted originals were read in seven contiguous bounded
+revision-bound windows; no PDF-image review or filename-derived chronology. Three
+extraction references/requests/plans are traceable, four units remain partial/mixed,
+three relation/actor/participation links unresolved; all ten remain provisional/
+private/unresolved/not promoted. Three remainder spans are unadjudicated. Candidate
+units are not unique facts. All32 summaries retain their previous partial/mixed
+status. Source totals remain301/301 read,zero unread,184mixed/unresolved tasks,
+1206findings,zero promoted,unique claims null; no duplicate source-review credit.
+Preparation binding/status validation and16 scratch negative controls pass; no
+real readers, paired answers, eligible gets, answer correctness, fact-loss/public
+eligibility/latency metrics or full/Node suite reruns. Initial271 prior artifacts
+and selected source/production/caller/config/pilot/API identity/socket checks pass;
+broader runtime hash inventory was captured after packet/before docs,not retroactive
+start proof. Prior receipts/annotations/failures/corrections/partial-worker artifacts/
+originals/quarantine/reference limits retained. Parent owns authorized HEARTBEAT/
+notifier changes; worker neither touched nor claimed them unchanged. STATE binds
+exact private packet,validation,preservation,manifest and next action. No imports/
+rebuilds/restarts/deployment/promotion/public-source expansion/primary reader-routing-
+config-voice/destruction/U5. Original conditional18–30active-hour estimate and all
+unfinished broader gates remain. Stop after this pilot for parent verification;
+no remainder batch or paired harness started.
