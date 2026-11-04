@@ -653,3 +653,28 @@ candidate before new integration. No host installation/reader execution/producti
 DB/build/restart/deploy/config/routing/voice/U5 or promotion;all real authority,
 effect-owner,active identity,confinement,settlement,write-denial gates remain open.
 Counts/cases unchanged;private evidence stays private. Sol/Medium;no new ETA.
+
+
+Packet30 separates the canonical core compiler policy from declaration acceptance;
+see `U4-CANONICAL-CORE-COMPILER.md` and `integration-candidates/packet30/`.
+All71 packet29 closure bindings matched before changes; before authority/resume/daily
+bytes retained. Fresh hash-bound archive extracted; compiler/native binary physically
+copied into scratch, other static dependencies reused/not frozen. Existing generated
+types supplied with scratch content stamp; no codegen/schema freshness claim. Actual
+wrapper policy defaults declaration=false and honors explicit true. Canonical core
+baseline and corrected candidate exit0/empty logs;uncorrected packet28 exits2 with
+exact TS2322+TS2345. Explicit declaration-enabled run hits120s watchdog/exit1/no
+diagnostic stdout;NOT607 reproduction or declaration acceptance. Initial validator
+assertion failure retained;reporting-only revision syntax checked,not full rerun.
+Both corrected patches and negative reverse to exact source;host target unchanged.
+Parent checked20log hashes and actual gate separation. Prior14dispatch tests not
+rerun/recounted. No live integration/reader/provider/session/productionDB/build/
+restart/deploy/config/routing/voice/U5/promotion or new source/quality claims.
+Next: one bounded default-off uninstalled host-owned invocation/executor candidate
+from U4-HOST-INTEGRATION-PATCH-DESIGN against pinned source/corrected cleanup, closed
+synthetic imports and exact admitted-context/rejection-before-provider controls.
+Do not run real providers or install. Effect-owner atomic protocol,active identity,
+confinement,whole settlement,productionwrite denial remain open;both real reader
+lanes unavailable. Declaration-enabled gate also remains open;future attempt must
+retain timeout and use justified deadline/resources and same-environment comparison.
+Counts/cases unchanged;parent HEARTBEAT/notifier untouched;Sol/Medium,no new ETA.
