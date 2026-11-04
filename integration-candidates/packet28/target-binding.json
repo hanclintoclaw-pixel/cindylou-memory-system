@@ -1,0 +1,7 @@
+{
+  "host_head": "4d94a9fac61f2e83331a09df18ad35cdfb1faf5c",
+  "target": "src/agents/embedded-agent-runner/run/run-attempt-dispatch.ts",
+  "target_sha256": "fd36ddec27849121d8800b45d87bdfd0a47e40c78e328000a53f03d62f83d4e4",
+  "candidate_sha256": "10eb1374e16ee670e6307fca31b24ca83a3580d23df454c7d72a20dee7dda525",
+  "scope": "uninstalled cleanup-only patch; no reader integration clearance"
+}

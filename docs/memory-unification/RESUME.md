@@ -620,3 +620,17 @@ probes/production DB/build or deployment/cutover/U5. Totals and private cases re
 unchanged; prior partial evidence preserved. Parent exclusively owns HEARTBEAT/
 notifier. STOP for independent parent review of packet27 commit/checkpoint/receipts/
 semantic scope; do not chain. Future work Sol/medium; no new ETA.
+
+
+Packet28 stages an UNINSTALLED cleanup-only host patch candidate in
+`integration-candidates/packet28/`; see `U4-HOST-CUSTODY-PATCH-CANDIDATE.md`.
+Recovered Packet27 completed parent review;18 original/7 final hashes match.
+Immediate post-resolution cleanup custody and nested finalizers target the actual
+host dispatch source, pinned by SHA-256; resolver-owned/borrowed release unchanged.
+11/11 candidate-helper tests plus scratch patch apply/reverse/exact-byte roundtrip
+and Node syntax checks pass. No whole-host typecheck or actual dispatch test yet.
+Next bounded task: isolated host checkout validation and actual dispatch-boundary
+mock tests; never apply/build in the running host. Real executor/effect-owner atomic
+protocol/active identity/confinement/whole settlement/production write-denial remain
+open;both real lanes unavailable. No production reader/config/voice/cutover/U5 change,
+no claim promotion or new quality/loss/latency/source-review credit. Sol/Medium.
