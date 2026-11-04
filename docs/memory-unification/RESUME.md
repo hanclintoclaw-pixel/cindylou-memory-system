@@ -603,3 +603,20 @@ API38899command/socket preserved;RESUMEappendonly. Parent ownsHEARTBEAT/notifier
 neithereditednorattestedunchanged. No rebuild/restart/deploy/import/rights/promotion/
 primaryreader/routing/config/voice/destruction/U5. Stop26forparentreview,nochain;
 futureSol/medium,historicalconditional18-30hoursnotnewETA;broadergatesunfinished.
+
+
+Packet27 implemented a default-off fixture-only attempt custody prototype in
+`tests/fixtures/attempt-custody.fixture.mjs` with deterministic tests in
+`tests/test_attempt_custody_fixture.mjs`; see `U4-ATTEMPT-CUSTODY-FIXTURE.md`.
+Recovered unchanged partial work and saved final 21/21 passing Node evidence;
+no recovery rerun and no retroactive execution hash claim. Immediate try/finally,
+owned/borrowed release, abort/revoke-first, settlement-before-release including
+post-settlement cleanup faults, synchronous scratch effect turnstile and fake
+identity/registration fail-closed controls are implemented. All are synthetic;
+actual host integration/atomic-owner effect protocol/active dependency-build identity/
+compatible confinement/whole-resource settlement/production-write denial remain
+open. Both real lanes unavailable. No IPC/real provider/reader/native worker/live
+probes/production DB/build or deployment/cutover/U5. Totals and private cases remain
+unchanged; prior partial evidence preserved. Parent exclusively owns HEARTBEAT/
+notifier. STOP for independent parent review of packet27 commit/checkpoint/receipts/
+semantic scope; do not chain. Future work Sol/medium; no new ETA.
