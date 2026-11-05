@@ -836,3 +836,24 @@ owner coordinator fixture, including outermost-only/nested-bypass negative contr
 No host/native/DB/provider/reader/network execution. Not started or scheduled here.
 Private review packet38-independent-20261105T023035Z;parent recovery packet38-parent-
 recovery-20261104. HEARTBEAT/notifier outside scope.
+
+
+## Packet39 — default-off participating-effect fixture
+
+Implemented one test-only fake store/two fixed fake owners; no production imports.
+Fresh outermost-only ownership, opaque single-use permits, pending/effective revoke,
+commit/settlement separation and retained quarantine for unknown resources. Delayed
+fake-native C remains fenced through reconciliation. Both cancellation arms suppress
+delivery without false rollback. Shipped literal false; only isolated VM tests alter
+it, no activation option. See U4-PARTICIPATING-EFFECT-FIXTURE.md.
+Final30/30synthetic tests pass, including6narrow mutants rejected by intended ordering/
+nested/lane assertions. Earlier31/31and29/29runs preserved,not final-source credit.
+296inherited+21additionalPacket38bindings verified;four exact mutable beforeimages.
+Self-review only,not independent code acceptance;no host compiler/declaration/build,
+native/reader/provider/DB/worker/network/liveprobe or old-suite run. No physical write-
+denial/real timeout/death/native atomicity/deadlock/quality/loss/parity/latency claim.
+Both real lanes unavailable;all real integration gates/counts/cases unchanged.
+Only fixture/tests/report/RESUME in code tier;private evidence packet39-20261104.
+No install/restart/deploy/config/routing/rights/voice/U5/ETA;HEARTBEAT/notifier outside
+scope,no new attestation. Next: independent exact-source fixture/control review;
+not host installation or real-reader execution. Sol/Medium.
