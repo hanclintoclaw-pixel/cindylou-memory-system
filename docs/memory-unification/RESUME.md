@@ -1,5 +1,33 @@
 # Resume memory unification
 
+## Current priority override — wiki/voice usefulness (2026-11-04)
+
+Read the [current roadmap](PLAN.md#current-roadmap--fast-reliable-wiki-answers-by-voice-2026-11-04)
+first. **Next: one bounded existing-path wiki retrieval baseline using 8–10 real
+questions**, including deep-page, ordinary synonym and absent-entity cases. Separate
+retrieval/fetch timings from total voice timings; identify the actual failure before
+choosing the smallest fix. This checkpoint changes documentation only: no baseline,
+live probe, runtime/source-approval change, voice canary or cleanup was executed.
+
+This priority **overrides stale `STATE.next_action` and every historical “next”
+instruction below**, especially the Packet43 host-writer/caller inventory. Read
+STATE/JOURNAL for receipts and real deployment constraints, not permission to resume
+that superseded sequence. Parent checkpointing will reconcile STATE with this
+roadmap; until then, do not dispatch the old action automatically.
+
+After the baseline: smallest existing-path fix → same-question comparison →
+authorized reversible voice shadow/canary and live-table check → consumer-checked,
+recoverable consolidation of redundant active sources/routes. No comprehensive
+claim adjudication, universal capture/caller migration or native atomic-revocation
+research prerequisite; these remain deferred and unproven. Preserve privacy/access
+checks, SR3 sources, truthful unknowns, read-only wiki access/no automatic wiki
+writes, originals/history and rollback. Do not infer broader source or deployment
+authority from the new priority. Evidence and results stay in the private data tier.
+
+## Historical restart protocol and checkpoint sequence
+
+Retained for evidence; its execution order is superseded by the priority above.
+
 1. Read `PLAN.md` and private
    `/Volumes/carbonite/claw/data/cindylou/runtime/memory-unification/STATE.json`.
 2. Worktree: `/Users/hanclaw/claw/projects/cindylou/worktrees/memory-unification`.
