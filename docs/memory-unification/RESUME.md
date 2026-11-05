@@ -756,3 +756,24 @@ confinement,whole resource settlement,productionwrite denial,declaration accepta
 remain OPEN. Next bounded action: independent source/negative-control review of
 this corrected private handoff before any further integration;not installation.
 Prior counts/cases unchanged;HEARTBEAT/notifier untouched;Sol/Medium,no new ETA.
+
+
+Packet35 corrects Packet34's independently reproduced omission of lane-only cancellation.
+The outer existing custody constructs/owns actual controls first; nested binder,
+lazy caller and unavailable executor capture exact controls.abortSignal composite.
+Inner no-op callbacks do not own/release a second lease. Binding expires before
+controls close and resolver release, including setup/cleanup faults and borrowed
+release. See U4-COMPOSITE-CANCELLATION-HANDOFF.md and integration-candidates/packet35/.
+Observed recovery controls: 20 enabled complete-dispatch, 16 disabled, 9 local rejection/cleanup pass. Pair/retention/consumer/upstream-only mutants fail 7/16/16/1 intended assertions, no syntax/import/unhandled rejection. Fresh canonical baseline/candidate exit zero with empty diagnostics; three patches reverse and selected installed source/compiler/static inputs match. Initial preflight, orphan overlap and failed orphan reversal retained; overlapping runs excluded.
+Both literals false, uninstalled; real lanes unavailable. No provider/native worker,
+real reader/session/DB/liveprobe/build/install/restart/deploy/config/routing/voice/
+rights/promotion/destructive retirement/rebuild/U5. Counts unchanged301/301read,
+0unread,184mixed,1206observations,0promoted,32partial;19privatecases/two groups.
+No quality/loss/parity/latency/source-review credit or ETA. Actual host authority,
+participating atomic effects,active dependency/build identity,compatible confinement,
+whole-resource settlement,production-write denial,declaration acceptance remain OPEN.
+Same-owner correction only; next bounded action: independent corrected-candidate
+source/negative-control review, not installation. Prior originals/failures retained;
+75 prior closure bindings and12 Packet34 artifacts preserved;four mutable before-images
+bound before append/checkpoint. Parent owns HEARTBEAT/notifier, worker untouched.
+Sol/Medium. Stop after this single packet.
