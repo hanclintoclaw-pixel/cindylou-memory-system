@@ -139,7 +139,7 @@ export function createParticipatingEffectFixture(options) {
     if ((outcome === 'committed' && r.outcome !== 'committed') ||
         (outcome === 'rolled-back' && r.outcome === 'committed')) return unavailable('contradictory-outcome');
     r.cleanupFailure ||= cleanupFailure;
-    if (outcome === 'unknown' || !resourcesSettled) {
+    if (outcome === 'unknown' || resourcesSettled !== true) {
       if (r.outcome !== 'committed') r.outcome = 'unknown';
       r.phase = 'unknown';
       r.resources = 'unknown';
@@ -155,7 +155,7 @@ export function createParticipatingEffectFixture(options) {
   function reconcile(permit, { outcome, resourcesSettled = false } = {}) {
     // Explicit synthetic native-owner report only; NOT a real recovery mechanism.
     const r = permits.get(permit);
-    if (!r || r.phase !== 'unknown' || !resourcesSettled ||
+    if (!r || r.phase !== 'unknown' || resourcesSettled !== true ||
         !['committed', 'rolled-back'].includes(outcome)) return unavailable('reconciliation');
     if (outcome === 'committed' && r.outcome !== 'committed') return unavailable('unobserved-commit');
     if (outcome === 'rolled-back' && r.outcome === 'committed') return unavailable('contradictory-outcome');

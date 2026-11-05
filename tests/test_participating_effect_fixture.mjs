@@ -26,6 +26,12 @@ async function load({ enabled = true, mutant } = {}) {
   if (mutant === 'ignore-lane') text = replaceOnce(text,
     '!r.cleanupFailure && !a.attemptAbort && !a.laneAbort &&',
     '!r.cleanupFailure && !a.attemptAbort &&');
+  if (mutant === 'truthy-settle') text = replaceOnce(text,
+    "outcome === 'unknown' || resourcesSettled !== true",
+    "outcome === 'unknown' || !resourcesSettled");
+  if (mutant === 'truthy-reconcile') text = replaceOnce(text,
+    "r.phase !== 'unknown' || resourcesSettled !== true ||",
+    "r.phase !== 'unknown' || !resourcesSettled ||");
   const module = new vm.SourceTextModule(text, { context: vm.createContext({}) });
   await module.link(() => { throw new Error('fixture imports forbidden'); });
   await module.evaluate();
@@ -322,3 +328,52 @@ test('discrimination: attempt-only delivery handoff fails lane-only abort contro
     error.code === 'ERR_ASSERTION' && error.message.includes('LANE_CANCEL_DENIES_DELIVERY'));
   laneControl();
 });
+
+
+function settlementValueControl(entrypoint, value, make = fixture) {
+  const f = make(), r = consumed(f);
+  const outcome = entrypoint === 'settle' ? 'committed' : 'rolled-back';
+  if (entrypoint === 'settle') f.commit(r.permit);
+  else f.settle(r.permit, { outcome: 'unknown' });
+  f.revoke('plugin');
+  f.revoke('session');
+  const result = f[entrypoint](r.permit, { outcome, resourcesSettled: value });
+  const snap = f.snapshot();
+  assert.equal(snap.releases, 0, 'NON_BOOLEAN_SETTLEMENT_MUST_RETAIN_FENCES');
+  assert.equal(snap.attemptReleases, 0);
+  assert.equal(snap.store.active, true);
+  assert.equal(snap.store.permit, true);
+  assert.equal(snap.store.quarantine, true);
+  assert.equal(snap.owners.every(o => o.phase === 'pending' && o.holders === 1), true);
+  assert.equal(snap.events.some(e => e.type === 'effective-revoke'), false);
+  assert.equal(result.status, entrypoint === 'settle' ? 'unknown' : 'unavailable');
+  unavailable(f.deliver(r.permit));
+  unavailable(f.prepare(f.mintAttempt()));
+  assert.equal(f.reconcile(r.permit, { outcome, resourcesSettled: true }).status, 'settled');
+  assert.equal(f.snapshot().releases, 1);
+  assert.equal(f.snapshot().attemptReleases, 1);
+  assert.equal(f.snapshot().store.quarantine, false);
+  assert.equal(f.snapshot().owners.every(o => o.phase === 'effective' && o.holders === 0), true);
+  unavailable(f.reconcile(r.permit, { outcome, resourcesSettled: true }));
+  assert.equal(f.snapshot().releases, 1);
+  if (entrypoint === 'settle') assertCommitBeforeEffective(f);
+}
+
+for (const entrypoint of ['settle', 'reconcile']) {
+  test(`${entrypoint} settlement report values require literal true before custody release`, () => {
+    const poison = new Proxy({}, { get() { throw new Error('settlement value inspected'); } });
+    for (const value of [false, undefined, null, 0, NaN, '', 'false', 'true', 1, -1,
+      {}, [], new Boolean(true), () => true, poison]) {
+      settlementValueControl(entrypoint, value);
+    }
+  });
+  test(`discrimination: truthy-${entrypoint} fails custody assertion for malformed report`, async () => {
+    const { create: broken } = await load({ mutant: `truthy-${entrypoint}` });
+    for (const value of ['false', {}]) {
+      assert.throws(() => settlementValueControl(entrypoint, value, () => broken(config)),
+        error => error.code === 'ERR_ASSERTION' &&
+          error.message.includes('NON_BOOLEAN_SETTLEMENT_MUST_RETAIN_FENCES'));
+      settlementValueControl(entrypoint, value);
+    }
+  });
+}

@@ -871,3 +871,17 @@ both entrypoints, regressions and truthiness mutants,then independent review.
 Both real lanes unavailable;all actual integration gates/counts/cases unchanged.
 No host/native/reader/DB/provider/worker/network/install/config/voice/U5/ETA changes.
 HEARTBEAT/notifier outside scope;not newly attested unchanged.
+
+
+## Packet41 — strict literal-true settlement correction
+
+Both fixture settlement entrypoints require resourcesSettled===true;malformed values
+retain transaction/cohort custody and quarantine. Two new regressions fail against
+old source at intended assertion;final34/34pass including8mutants (2newtruthiness).
+15values per entrypoint,positive true recovery/exactonce and pending fences checked.
+379Packet40closurebindings verified via6beforeimages;old failed probes unchanged.
+See U4-STRICT-SETTLEMENT-CORRECTION.md;private evidence packet41-20261104.
+Same-owner correction only;independent exact-source review next,not installation.
+Shipped literal false;real lanes unavailable;all nativeintegration gates/counts/cases
+unchanged. No host/build/native/reader/DB/provider/worker/network/config/voice/U5/ETA.
+HEARTBEAT/notifier outside scope,not newly attested unchanged. Sol/Medium.
