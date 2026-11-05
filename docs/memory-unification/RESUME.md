@@ -730,3 +730,29 @@ atomic effect protocol, active dependency/build identity, compatible confinement
 whole resource settlement, production-write denial, declaration acceptance and
 independent corrected-candidate review remain OPEN. Both real lanes unavailable;
 counts/cases unchanged;parent HEARTBEAT/notifier untouched;no ETA.
+
+
+Packet33 stages the private opaque-handle handoff into the unavailable Packet31
+executor; see U4-PRIVATE-EXECUTOR-HANDOFF.md and integration-candidates/packet33/.
+Exact original admitted context/resolver audience/attempt abort signal enter the
+binder. Enabled-only lazy caller capture uses actual dispatch host values. Executor
+creation/read currency consumes the exact handle/caller/admitted/audience/signal;
+crossed/copied/expired/aborted captures reject before request access. Binder expires
+before controls close/resolver release, including cleanup faults and borrowed no-op.
+Both shipped literal policies remain false, no public/config switch. All reads stay
+unavailable; no provider/backend path. Final43/43 synthetic controls pass
+(18enabled/16disabled/9rejection);three VM mutants fail6/16/16 intended assertions.
+Initial test/validator/logs retained;final test-only rejection observation correction
+removes mutant unhandled rejections. Fresh canonical core baseline/candidate exit0
+empty diagnostics;50rawlog hashes checked,3patches reversed,selected host source
+unchanged. Compiler/generated/stamp hashes match Packet32, link targets Packet30;
+dependency contents not frozen/runtime identity unproven.72prior closure hashes
+preserved with immutable before snapshots;initial schema KeyError before mutation
+retained. Same-owner review only;independent corrected-candidate review OPEN.
+No real reader/provider/session/DB/liveprobes/build/install/restart/deploy/config/
+routing/voice/rights/promotion/retirement/rebuild/U5;both real lanes unavailable.
+Actual authority integration,atomic participating effects,activeidentity,compatible
+confinement,whole resource settlement,productionwrite denial,declaration acceptance
+remain OPEN. Next bounded action: independent source/negative-control review of
+this corrected private handoff before any further integration;not installation.
+Prior counts/cases unchanged;HEARTBEAT/notifier untouched;Sol/Medium,no new ETA.
