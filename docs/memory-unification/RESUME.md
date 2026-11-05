@@ -796,3 +796,23 @@ Next bounded action: source-only participating-effect-owner atomic commit/revoca
 protocol design/review, not implementation/install/real readers/declaration retry.
 Stop this checkpoint before design work. Sol/Medium; HEARTBEAT/notifier untouched
 by this worker (not newly attested unchanged); no ETA.
+
+
+## Packet37 — participating-effect/revocation design only
+
+Bounded source-only protocol design: concrete native publication/cache/origin and
+shared plugin-state owners, session/plugin revocation owners, grant-to-COMMIT race.
+See U4-PARTICIPATING-EFFECT-REVOCATION-DESIGN.md. Proposed single-store retained
+reservation spans actual native settlement; effective revocation waits older commits,
+not instantaneous AbortSignal preemption. Upstream owner participation required;
+independent stores excluded/partitioned or independently reported, no global rollback.
+22 source files/37 windows;12future synthetic control specifications,0executed.
+Four mutable beforeimages/old mappings preserved;267Packet36 closure bindings verified.
+Both literals false,real lanes unavailable;no code/patch/implementation/installation,
+realreader/provider/session/nativeworker/DB/liveprobe/build/declarationretry or new
+quality/loss/parity/latency/source-review credit. All counts/cases/open gates unchanged.
+Packet35 EOF whitespace defect and original evidence retained. Sol/Medium.
+Next: independent review of this owner protocol; only after separate authorization,
+one default-off uninstalled single-fake-store/two-fake-owner coordinator fixture.
+Do not chain implementation; stop for parent verification. HEARTBEAT/notifier outside
+scope,no new unchanged attestation;no ETA.
