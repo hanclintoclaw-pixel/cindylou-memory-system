@@ -885,3 +885,19 @@ Same-owner correction only;independent exact-source review next,not installation
 Shipped literal false;real lanes unavailable;all nativeintegration gates/counts/cases
 unchanged. No host/build/native/reader/DB/provider/worker/network/config/voice/U5/ETA.
 HEARTBEAT/notifier outside scope,not newly attested unchanged. Sol/Medium.
+
+
+## Packet42 — independent strict-settlement correction accepted
+
+Independent Sol/Medium accepts corrected synthetic scope at a668dfc,not native
+integration/migration. Fresh reviewer frozen suite34/34pass incl8mutants;separate
+33/33scenario probe pass. Parent recovered report/read source/diff/logs,verified
+16reviewartifact hashes/5frozen source bindings/404inherited bindings/4beforeimages;
+no parent test rerun. Packet40 rejection and all original failures retained.
+See U4-STRICT-SETTLEMENT-INDEPENDENT-REVIEW.md;private packet42-independent-20261104
+and packet42-parent-20261104. Literal remains false;real lanes unavailable;all actual
+nativeintegration gates/U4cutovers/U5/counts/cases unchanged. No live/config/voice/
+rights/promotion/ETA change;HEARTBEAT/notifier outside scope,no new attestation.
+Next one bounded source-only upstream implementation-seam plan,not implementation:
+actual authority writers,exclusive outermost ownership,whole-resource settlement and
+fail-closed boundary. No host build/native/reader/DB/provider/worker/network execution.
