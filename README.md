@@ -4,11 +4,19 @@ Staged data pipeline for ingestion, OCR cleanup, memory organization, caching, a
 
 ## Memory unification (in development)
 
+**New to the project? Start with [the plain-language architecture guide](docs/memory-unification/START-HERE.md),
+then choose [ELI5](docs/memory-unification/ELI5.md) or [ELI10](docs/memory-unification/ELI10.md).
+Both explanations include Mermaid diagrams and separate the intended system from what exists today.**
+
 See [the executable staged plan](docs/memory-unification/PLAN.md),
 [restart instructions](docs/memory-unification/RESUME.md), and
 [initial checkpoint](docs/memory-unification/CHECKPOINT-2026-10-31.md).
-The `unification/` module is an isolated, non-production prototype. Existing CLI/API
-routes are not switched; native hybrid and session integration are not yet implemented.
+The `unification/` module contains staged shared-service, capture, and adapter code.
+A limited public native-search pilot and separate optional two-section public canary
+have been demonstrated; ordinary memory routes have not been replaced.
+Broad host-authorized memory/session integration, full-source quality evaluation,
+and voice/game-table rollout remain unfinished. The new guides summarize the
+status as of November 4, 2026; older documents retain their historical evidence.
 
 ## Repository Layout
 - `01_ingestion/` raw ingestion and OCR runners
