@@ -777,3 +777,22 @@ source/negative-control review, not installation. Prior originals/failures retai
 75 prior closure bindings and12 Packet34 artifacts preserved;four mutable before-images
 bound before append/checkpoint. Parent owns HEARTBEAT/notifier, worker untouched.
 Sol/Medium. Stop after this single packet.
+
+
+Packet36 records independent narrow acceptance of Packet35 composite cancellation
+and local pair/lifetime/cleanup custody, not global integration clearance.
+See U4-COMPOSITE-CANCELLATION-INDEPENDENT-REVIEW.md. Recovered prior-review execution:
+48/48 synthetic controls (12 independent,20 enabled-VM,16 disabled); upstream-only,
+pair,retention,consumer mutants fail1/7/16/16 intended assertions. Recovery verifies
+13 source+22 artifact hashes; no checkpoint tests/compiler/live probes or new source
+review credit. Exact final controls.abortSignal retained; pair identity and expiry
+before close/release, borrowed no-op custody, setup/dispatch/cleanup failures intact.
+Both literals false, no public enable option/provider path; both real lanes unavailable.
+Stored patch EOF whitespace remains separate hygiene defect; no code repair.
+All prior blockers/counts/constraints unchanged; no installation/real-reader/declaration
+clearance, quality/loss/parity/latency/U5 claim. Four mutable beforeimages and prior
+closure mappings retained privately; original review artifacts untouched.
+Next bounded action: source-only participating-effect-owner atomic commit/revocation
+protocol design/review, not implementation/install/real readers/declaration retry.
+Stop this checkpoint before design work. Sol/Medium; HEARTBEAT/notifier untouched
+by this worker (not newly attested unchanged); no ETA.
