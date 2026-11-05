@@ -901,3 +901,19 @@ rights/promotion/ETA change;HEARTBEAT/notifier outside scope,no new attestation.
 Next one bounded source-only upstream implementation-seam plan,not implementation:
 actual authority writers,exclusive outermost ownership,whole-resource settlement and
 fail-closed boundary. No host build/native/reader/DB/provider/worker/network execution.
+
+
+## Packet43 — source-only upstream ownership seam plan
+
+Maps accepted fixture invariants to7pinned host files/10bounded windows;source hashes/
+size/mtime unchanged. Concrete change points:borrowed/owned attempt custody,plugin
+synchronous revoke vs future pending/drain completion,session mutation finalizers,
+nonretractable worker grant,fresh outermost transaction,actual publication COMMIT,
+authenticated native settlement/reconciliation. Generic finalization is not proof of
+settlement;do not silently change synchronous revoke semantics.432priorbindings/
+4beforeimages retained;zero tests/builds/native/live execution. See
+U4-UPSTREAM-OWNERSHIP-SEAM-PLAN.md;private packet43-20261104. Plan only,not independent
+acceptance/implementation/SDK or nativeclearance. Next bounded source-only plugin/
+session authority-writer and caller coverage inventory plus plan review before patch.
+All actual integration gates/U4cutovers/U5/counts/cases unchanged;real lanes unavailable.
+No install/config/voice/rights/promotion/ETA change. HEARTBEAT/notifier outside scope.
