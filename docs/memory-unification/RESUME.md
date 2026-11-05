@@ -816,3 +816,23 @@ Next: independent review of this owner protocol; only after separate authorizati
 one default-off uninstalled single-fake-store/two-fake-owner coordinator fixture.
 Do not chain implementation; stop for parent verification. HEARTBEAT/notifier outside
 scope,no new unchanged attestation;no ETA.
+
+
+## Packet38 — independent protocol review and outermost-transaction correction
+
+Fresh Sol/Medium independent review found nested SAVEPOINT bypass of withCommit.
+Appended source-bound design correction: fresh exclusive outermost transaction only,
+exact transaction-bound permit, no inherited nesting, custody through native settlement.
+Reviewer separately ACCEPTED corrected DESIGN ONLY; original defect/drift reports retained.
+See U4-PARTICIPATING-EFFECT-INDEPENDENT-REVIEW.md. Parent verified296 inherited
+bindings/22static source hashes/4beforeimages and25fresh review artifact hashes.
+Independent17files/25windows/1416lines plus design/addendum;zero executed controls/
+tests/compiler/builds/readers. Two interrupted drafts archived byte-for-byte;historical
+high effort claim retained,not credited to current Sol/Medium. Both real lanes unavailable;
+all actual integration/nativeeffects/identity/confinement/settlement/writedenial/
+declaration gates open;counts/cases unchanged. No install/config/voice/rights/U5/ETA.
+Next authorized staged action: one default-off uninstalled single-fake-store/two-fake-
+owner coordinator fixture, including outermost-only/nested-bypass negative controls.
+No host/native/DB/provider/reader/network execution. Not started or scheduled here.
+Private review packet38-independent-20261105T023035Z;parent recovery packet38-parent-
+recovery-20261104. HEARTBEAT/notifier outside scope.

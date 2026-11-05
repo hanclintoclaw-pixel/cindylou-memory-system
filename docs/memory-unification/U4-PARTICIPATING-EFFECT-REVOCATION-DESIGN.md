@@ -264,3 +264,36 @@ unique claims null,32partial summaries;19private cases/two groups remain unresol
 All older evidence/manifests and Packet35 patch EOF whitespace defect retained.
 HEARTBEAT/notifier are outside this packet; no fresh unchanged attestation.
 Stop after this packet for parent verification.
+
+
+## Packet38 correction — outermost transaction ownership
+
+Independent source-only review identified an omitted same-connection nesting case.
+`src/infra/sqlite-transaction.ts:385–410` uses SAVEPOINT/RELEASE for an already-active
+transaction and returns without invoking `options.withCommit`. Only the outermost
+branch invokes that callback around the actual native COMMIT (`:423–443`). A nested
+helper return or RELEASE SAVEPOINT is therefore not commit C, and connection identity
+alone cannot bind the retained reservation to that COMMIT.
+
+The proposed first fixture/protocol scope MUST require a fresh outermost transaction
+with no transaction already active on its connection. Reject nested/already-active
+transaction admission before BEGIN/DML, permit consumption or effect callback access.
+Bind the opaque one-use reservation to the exact outer transaction identity in
+addition to attempt, connection, immutable intent, authority generations and nonce.
+Retain all participating-owner fences through that outer transaction's proven native
+settlement; an inner return cannot release them. Check and BEGIN must be serialized
+under the exclusively owned effect connection, not a racy standalone isTransaction
+observation. Unknown transaction ownership remains unavailable.
+
+Authenticated inheritance through an existing outer transaction is NOT supported by
+this scope. Any future nesting design must separately prove outer-owner custody,
+actual outer-COMMIT consumption and settlement; it is not admitted by this addendum.
+Add a deterministic nested/already-active rejection control and a narrowly broken
+savepoint-as-commit/early-release mutant that fails on ordering/effect assertions,
+not merely result rejection or timeout. These are specifications: zero controls run.
+
+This is a documentation correction only, not independent acceptance of corrected
+code, native integration or a real lane. Both real lanes remain unavailable; all
+prior upstream participation, identity, confinement, settlement, write-denial and
+declaration gates remain open. The original Packet37 revision remains in git and
+its private closure is retained unchanged.
