@@ -857,3 +857,17 @@ Only fixture/tests/report/RESUME in code tier;private evidence packet39-20261104
 No install/restart/deploy/config/routing/rights/voice/U5/ETA;HEARTBEAT/notifier outside
 scope,no new attestation. Next: independent exact-source fixture/control review;
 not host installation or real-reader execution. Sol/Medium.
+
+
+## Packet40 — independent fixture review requires correction
+
+Independent Sol/Medium exact-source review of5378f63:30/30existing controls pass,
+8adversarial probes yield4pass/4intended invariant failures. Both settlement paths
+coerce resourcesSettled;truthy malformed string/object releases custody prematurely.
+No independent code acceptance. Parent verifies15reviewartifact hashes and358saved
+bindings/fourbeforeimages. Original failed probes/source/logs retained privately.
+See U4-PARTICIPATING-EFFECT-CODE-REVIEW.md. Next: strict literal-true correction in
+both entrypoints, regressions and truthiness mutants,then independent review.
+Both real lanes unavailable;all actual integration gates/counts/cases unchanged.
+No host/native/reader/DB/provider/worker/network/install/config/voice/U5/ETA changes.
+HEARTBEAT/notifier outside scope;not newly attested unchanged.
